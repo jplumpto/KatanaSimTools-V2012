@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MotionPlatformPlugin", "MotionPlatformPlugin\MotionPlatformPlugin.vcxproj", "{4C509D05-DC4D-4A94-B396-FE1A6D6E29CD}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FlightInputReplayPlugin", "FlightInputReplayPlugin\FlightInputReplayPlugin.vcxproj", "{A61A1DB0-98D3-4ADE-9C31-E34FD8685A8F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Debug|x64 = Debug|x64
+		Release|Win32 = Release|Win32
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4C509D05-DC4D-4A94-B396-FE1A6D6E29CD}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4C509D05-DC4D-4A94-B396-FE1A6D6E29CD}.Debug|Win32.Build.0 = Debug|Win32
+		{4C509D05-DC4D-4A94-B396-FE1A6D6E29CD}.Debug|x64.ActiveCfg = Debug|x64
+		{4C509D05-DC4D-4A94-B396-FE1A6D6E29CD}.Debug|x64.Build.0 = Debug|x64
+		{4C509D05-DC4D-4A94-B396-FE1A6D6E29CD}.Release|Win32.ActiveCfg = Release|Win32
+		{4C509D05-DC4D-4A94-B396-FE1A6D6E29CD}.Release|Win32.Build.0 = Release|Win32
+		{4C509D05-DC4D-4A94-B396-FE1A6D6E29CD}.Release|x64.ActiveCfg = Release|x64
+		{4C509D05-DC4D-4A94-B396-FE1A6D6E29CD}.Release|x64.Build.0 = Release|x64
+		{A61A1DB0-98D3-4ADE-9C31-E34FD8685A8F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A61A1DB0-98D3-4ADE-9C31-E34FD8685A8F}.Debug|Win32.Build.0 = Debug|Win32
+		{A61A1DB0-98D3-4ADE-9C31-E34FD8685A8F}.Debug|x64.ActiveCfg = Debug|x64
+		{A61A1DB0-98D3-4ADE-9C31-E34FD8685A8F}.Debug|x64.Build.0 = Debug|x64
+		{A61A1DB0-98D3-4ADE-9C31-E34FD8685A8F}.Release|Win32.ActiveCfg = Release|Win32
+		{A61A1DB0-98D3-4ADE-9C31-E34FD8685A8F}.Release|Win32.Build.0 = Release|Win32
+		{A61A1DB0-98D3-4ADE-9C31-E34FD8685A8F}.Release|x64.ActiveCfg = Release|x64
+		{A61A1DB0-98D3-4ADE-9C31-E34FD8685A8F}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
