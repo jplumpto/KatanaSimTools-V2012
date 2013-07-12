@@ -950,7 +950,7 @@
             this.MDAFileBox.Name = "MDAFileBox";
             this.MDAFileBox.Size = new System.Drawing.Size(95, 21);
             this.MDAFileBox.TabIndex = 25;
-            this.MDAFileBox.Text = "101 - Original";
+            this.MDAFileBox.Text = "102 - Overtilt";
             this.MDAFileBox.SelectedIndexChanged += new System.EventHandler(this.MDAFileBox_SelectedIndexChanged);
             // 
             // label21

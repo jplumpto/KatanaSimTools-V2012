@@ -86,6 +86,8 @@ namespace MotionPlatformControl
     public partial class ControlGUI : Form
     {
         #region MOOG_Constants
+        const int Time_Offset = 80;
+
         //Motion Command Words
         const byte MOOG_DISABLE = 0x00DC;
         const byte MOOG_PARK = 0xD2;
@@ -97,6 +99,7 @@ namespace MotionPlatformControl
         const byte MOOG_NEWMDAFILE = 0x9B;  //Change MDA File
 
         private byte[] MOOG_MDAOPTIONS = new byte[6] { 101, 102, 103, 104, 105, 106};
+        private ComboBox.ObjectCollection MOOG_MDAOPTIONSTRINGS = null;
         #endregion
 
         #region Variables
@@ -104,7 +107,7 @@ namespace MotionPlatformControl
         private const double Deg2Rad = Math.PI / 180.0;
         private double recvDeltaTime = 0;
         private double sendDeltaTime = 0;
-        private double maxDeltaTime = 0;
+        private double meanDeltaTime = 0;
         private Label[] DiscreteIO = new Label[8];
         private Label[] Faults = new Label[16];
         private Thread InputUDPThread = null;
@@ -123,18 +126,21 @@ namespace MotionPlatformControl
         private uint PlatformFault = 0;
         private byte PlatformState = 0;
         private byte PlatformLastState = 16;
-        private byte RequestedState = 0;
-        private byte RequestedMDAFile = 101;
+        private byte RequestedState = MOOG_NEWMDAFILE;
+        private byte RequestedMDAFile = 102;
         private MDACommand CurrentMDACommand;
         private MOOGResponse CurrentMOOGResponse;
         private AhrsSerialData _crossbowConnection = null;
-        
+
+        private int MoogSendStateCount = 0;
         private Stopwatch MoogElapsedSendState = new Stopwatch();
         private string MOOGhostname = "255.255.255.255";
         private int MOOGdestport = 992; //Platform sends and receives on different ports
         private IPEndPoint MOOGRemoteIpEndPoint = new IPEndPoint(IPAddress.Parse("255.255.255.255"), 991);
         private System.Net.Sockets.UdpClient MOOGPlatformRcvUDP = new System.Net.Sockets.UdpClient(992);
         private int MoogSendTimeOutMS = 16; //ms
+
+        private byte[] XplaneBytes = null;
 
         #endregion //Variables
 
@@ -143,6 +149,7 @@ namespace MotionPlatformControl
         {
             InitializeComponent(); //C# automatic form Stuff
             CurrentMDACommand = new MDACommand();
+            XplaneBytes = getBytes(CurrentMDACommand);
             InitLabelArrays();
             InitializeThread();
 
@@ -231,6 +238,9 @@ namespace MotionPlatformControl
             DiscreteIO[5] = Discrete_5;
             DiscreteIO[6] = Discrete_6;
             DiscreteIO[7] = Discrete_7;
+
+            //Update MDA String list
+            MOOG_MDAOPTIONSTRINGS = MDAFileBox.Items;
         }
         #endregion
 
@@ -242,41 +252,64 @@ namespace MotionPlatformControl
             IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
             System.Net.Sockets.UdpClient InputUDPClient = new System.Net.Sockets.UdpClient(5345);
 
+            //Stopwatch freqTimer = new Stopwatch();
+            //double currentFrequency = 0.0;
+            //int recvCount = 0;
+
+            UpdateMutex.WaitOne();
+            byte LocalRequestedState = RequestedState;
+            UpdateMutex.ReleaseMutex();
+
+            //freqTimer.Start();
+
             while (InputUpdate)
             {
                 if (InputUDPClient.Available > 0)
                 {
                     try
                     {
-					    byte[] recvBytes = InputUDPClient.Receive(ref RemoteIpEndPoint);
+                        byte[] recvBytes = InputUDPClient.Receive(ref RemoteIpEndPoint);
                         double secs = DateTime.Now.TimeOfDay.TotalSeconds;
-
-					    InputDataMutex.WaitOne();
-					    CurrentMDACommand = fromBytes(recvBytes);
-                        InputDataMutex.ReleaseMutex();
-                        
-                        recvDeltaTime = secs - CurrentMDACommand.elapsedTime;
-
-                        UpdateMutex.WaitOne();
-                        byte LocalRequestedState = RequestedState;
-                        UpdateMutex.ReleaseMutex();
 
                         if (LocalRequestedState == MOOG_NEWMDA && MoogElapsedSendState.ElapsedMilliseconds >= MoogSendTimeOutMS)
                         {
                             //Send updated state
-                            SendState(MOOGPlatformRcvUDP, MOOGhostname, MOOGdestport);
+                            SendState(MOOGPlatformRcvUDP, MOOGhostname, MOOGdestport, recvBytes);
+                            MoogSendStateCount++;
                             MoogElapsedSendState.Reset();
                             MoogElapsedSendState.Start();
                         }
-                    
+
+                        InputDataMutex.WaitOne();
+                        XplaneBytes = recvBytes;
+                        InputDataMutex.ReleaseMutex();
+
+                        recvDeltaTime = secs - BitConverter.ToDouble(recvBytes, Time_Offset);
+
+                        //recvCount++;
+                        //if (recvCount >= 500)
+                        //{
+                        //    long elapsedTime = freqTimer.ElapsedMilliseconds;
+                        //    currentFrequency = 1000.0 * recvCount / elapsedTime;
+                        //    recvCount = 0;
+                        //    freqTimer.Reset();
+                        //    freqTimer.Start();
+                        //    errorBar.BeginInvoke(new InvokeDelegateString(ErrorBarMessage), "Freq: " + currentFrequency.ToString("000.00") + " Hz");
+                        //}
                     }
                     catch (System.Exception ex)
                     {
                         MessageBox.Show(ex.Message);
                         break;
                     }
-                    
+
                 } //if
+                else
+                {
+                    UpdateMutex.WaitOne();
+                    LocalRequestedState = RequestedState;
+                    UpdateMutex.ReleaseMutex();
+                }
             } //while
 
             InputUDPClient.Close();
@@ -335,7 +368,10 @@ namespace MotionPlatformControl
                             lastMDAFile = RespStatus[1];
                             try
                             {
-                                errorBar.BeginInvoke(new InvokeDelegateString(ErrorBarMessage), "Current MDA File: MDA" + lastMDAFile.ToString("000") + ".in");
+                                int index = Array.FindIndex(MOOG_MDAOPTIONS, item => item == lastMDAFile);
+                                MDAFileBox.BeginInvoke(new InvokeDelegateComboIndex(UpdateComboBoxIndex), MDAFileBox, index);
+                                //MDAFileBox.BeginInvoke(new InvokeDelegateComboString(UpdateComboBoxValue), MDAFileBox, lastMDAFile.ToString("000"));
+                                //errorBar.BeginInvoke(new InvokeDelegateString(ErrorBarMessage), "Current MDA File: MDA" + lastMDAFile.ToString("000") + ".in");
                             }
                             catch (System.Exception ex)
                             {
@@ -369,15 +405,16 @@ namespace MotionPlatformControl
                 } //if
                 #endregion
 
+                UpdateMutex.WaitOne();
+                byte LocalRequestedState = RequestedState;
+                UpdateMutex.ReleaseMutex();
+
                 #region SendPlatformPacket
                 //Only run if significant time has passed
-                if (elapsedTimer.ElapsedMilliseconds >= MoogSendTimeOutMS)
+                if (elapsedTimer.ElapsedMilliseconds >= MoogSendTimeOutMS || (LocalRequestedState == MOOG_NEWMDA && MoogElapsedSendState.ElapsedMilliseconds >= MoogSendTimeOutMS))
                 {
                     try
                     {
-                        UpdateMutex.WaitOne();
-                        byte LocalRequestedState = RequestedState;
-                        UpdateMutex.ReleaseMutex();
 
                         if (LocalRequestedState == MOOG_DISABLE)
                         {
@@ -392,7 +429,12 @@ namespace MotionPlatformControl
                                 if (LocalRequestedState == MOOG_NEWMDA && MoogElapsedSendState.ElapsedMilliseconds >= MoogSendTimeOutMS)
                                 {
                                     //Send updated state
-                                    SendState(MOOGPlatformRcvUDP, MOOGhostname, MOOGdestport);
+                                    InputDataMutex.WaitOne();
+                                    byte[] localBytes = XplaneBytes;
+                                    InputDataMutex.ReleaseMutex();
+                                    SendState(MOOGPlatformRcvUDP, MOOGhostname, MOOGdestport,localBytes);
+                                    //SendCommand(MOOG_MDAMODE, MOOGPlatformRcvUDP, MOOGhostname, MOOGdestport);
+                                    MoogSendStateCount++;
                                     MoogElapsedSendState.Reset();
                                     MoogElapsedSendState.Start();
                                 }
@@ -426,7 +468,6 @@ namespace MotionPlatformControl
                                     SendMDAFileChange(MOOGPlatformRcvUDP, MOOGhostname, MOOGdestport);
                                     if (RequestedMDAFile == lastMDAFile)
                                     {
-
                                         UpdateMutex.WaitOne();
                                         RequestedState = MOOG_MDAMODE;
                                         UpdateMutex.ReleaseMutex();
@@ -512,6 +553,7 @@ namespace MotionPlatformControl
                     sendCount++;
                     if (sendCount >= 500)
                     {
+                        //Ensures Consistent Platform Communications
                         long elapsedTime = freqTimer.ElapsedMilliseconds;
                         currentFrequency = 1000.0 * sendCount / elapsedTime;
                         sendCount = 0;
@@ -533,7 +575,18 @@ namespace MotionPlatformControl
                             MoogSendTimeOutMS -= 1;
                         }
 
-                        errorBar.BeginInvoke(new InvokeDelegateString(ErrorBarMessage), "Freq: " + currentFrequency.ToString("000.00") + " Hz, with timeout:" + MoogSendTimeOutMS.ToString("000") + " ms");
+                        //Update Send State Frequency
+                        if (MoogSendStateCount > 100)
+                        {
+                            currentFrequency = 1000.0 * MoogSendStateCount / elapsedTime;
+                            errorBar.BeginInvoke(new InvokeDelegateString(ErrorBarMessage), "Send State Freq: " + currentFrequency.ToString("000.00") + " Hz");
+
+                            meanDeltaTime = sendDeltaTime / MoogSendStateCount;
+                            SendDeltaTimeTextbox.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), SendDeltaTimeTextbox, meanDeltaTime.ToString("0.000"));
+                        }
+                        MoogSendStateCount = 0;
+                        sendDeltaTime = 0;
+
                         freqTimer.Reset();
                         freqTimer.Start();
                     }
@@ -553,9 +606,7 @@ namespace MotionPlatformControl
         {
             uint last_io = uint.MaxValue; //Init to impossible value
             uint last_fault = uint.MaxValue;
-            Stopwatch timeout = new Stopwatch();
-            timeout.Start();
-
+            
             Thread.Sleep(1000);
 
             while (PlatformUpdate)
@@ -582,7 +633,8 @@ namespace MotionPlatformControl
                     UpdateFeedbackState(local_resp);
 
                     InputDataMutex.WaitOne();
-                    MDACommand LocalMDACommand = CurrentMDACommand;
+                    //MDACommand LocalMDACommand = CurrentMDACommand;
+                    MDACommand LocalMDACommand = fromBytes(XplaneBytes);
                     InputDataMutex.ReleaseMutex();
 
                     UpdateCommandDataDisplay(LocalMDACommand);
@@ -592,14 +644,6 @@ namespace MotionPlatformControl
                         UpdateCrossbowDisplay();
                     }
 
-                    if (sendDeltaTime > maxDeltaTime || timeout.ElapsedMilliseconds > 1000)
-                    {
-                        timeout.Reset();
-                        timeout.Start();
-                        maxDeltaTime = sendDeltaTime;
-                        SendDeltaTimeTextbox.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), SendDeltaTimeTextbox, sendDeltaTime.ToString("0.000"));
-                    }
-                    
                     Thread.Sleep(50);
 
                 }
@@ -648,17 +692,13 @@ namespace MotionPlatformControl
 
         #region SendToMoog
         //Sends most recent MDA command
-        private void SendState(System.Net.Sockets.UdpClient PlatformSendUDP, string hostname, int port)
+        private void SendState(System.Net.Sockets.UdpClient PlatformSendUDP, string hostname, int port, byte[] localBytes)
         {
-            InputDataMutex.WaitOne();
-            MDACommand LocalCurrentMDA = CurrentMDACommand;
-            InputDataMutex.ReleaseMutex();
-
-            byte[] sendBytes = flipStrBytes(LocalCurrentMDA);
+            byte[] sendBytes = flipStrBytes(localBytes);
 
             try
             {
-                sendDeltaTime = DateTime.Now.TimeOfDay.TotalSeconds - LocalCurrentMDA.elapsedTime;
+                sendDeltaTime += DateTime.Now.TimeOfDay.TotalSeconds - BitConverter.ToDouble(localBytes, Time_Offset);
                 PlatformSendUDP.Send(sendBytes, sendBytes.Length, hostname, port);
             }
             catch (System.Exception ex)
@@ -880,6 +920,21 @@ namespace MotionPlatformControl
             return new_arr;
         }
 
+        byte[] flipStrBytes(byte[] arr)
+        {
+            byte[] new_arr = new byte[arr.Length];
+
+            for (int j = 0; j < arr.Length; j = j + 4)
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    new_arr[i + j] = arr[3 - i + j];
+                } //for
+            } //for
+
+            return new_arr;
+        }
+
         byte[] flipBytes(byte[] arr,int index)
         {
             byte[] new_arr = new byte[4];
@@ -1012,6 +1067,19 @@ namespace MotionPlatformControl
         public void UpdateTextBoxValue(TextBox tmpTextBox, string value)
         {
             tmpTextBox.Text = value;
+        }
+
+        public delegate void InvokeDelegateComboString(ComboBox tmpComboBox, string value);
+        public void UpdateComboBoxValue(ComboBox tmpComboBox, string value)
+        {
+            tmpComboBox.Text = value;
+        }
+
+        public delegate void InvokeDelegateComboIndex(ComboBox tmpComboBox, int index);
+        public void UpdateComboBoxIndex(ComboBox tmpComboBox, int value)
+        {
+            tmpComboBox.SelectedIndex = value;
+            tmpComboBox.Text = MOOG_MDAOPTIONSTRINGS[value].ToString();
         }
         #endregion
 
