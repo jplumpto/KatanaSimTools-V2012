@@ -1255,6 +1255,7 @@ namespace MotionPlatformControl
 
             string line;
             line = "Elapsed Time (ms), X Acceleration (m/s/s), Y Acceleration (m/s/s) , Z Acceleration (m/s/s) , Roll (rad) , Pitch (rad) , Yaw (rad) , Roll Velocity (rad/s) , Pitch Velocity (rad/s) , Yaw Velocity (rad/s) , Roll Acceleration (rad/s/s) , Pitch Acceleration (rad/s/s) , Yaw Acceleration (rad/s/s)";
+            line += ", Moog Roll (rad), Moog Pitch (rad), Moog Yaw (rad)";
             if (_crossbowConnection != null && _crossbowConnection.IsOpen())
             {
                 line += ", " + _crossbowConnection.GetLineFormatRads();
@@ -1267,12 +1268,19 @@ namespace MotionPlatformControl
             while (RecordingUpdate)
             {
                 System.Threading.Thread.Sleep(20);
-                
+
                 InputDataMutex.WaitOne();
-                MDACommand data = CurrentMDACommand;
+                byte[] dataBytes = XplaneBytes; 
                 InputDataMutex.ReleaseMutex();
+                MDACommand data = fromBytes(dataBytes);
+                
+
+                MOOGMutex.WaitOne();
+                MOOGResponse local_resp = CurrentMOOGResponse;
+                MOOGMutex.ReleaseMutex();
                 
                 line = elapsedTimer.ElapsedMilliseconds.ToString() + ", " + data.a_x.ToString() + ", " + data.a_y.ToString() + ", " + data.a_z.ToString() + ", " + data.roll.ToString() + ", " + data.pitch.ToString() + ", " + data.yaw.ToString() + ", " + data.v_roll.ToString() + ", " + data.v_pitch.ToString() + ", " + data.v_yaw.ToString() + ", " + data.a_roll.ToString() + ", " + data.a_pitch.ToString() + ", " + data.a_yaw.ToString();
+                line += ", " + local_resp.roll.ToString() + ", " + local_resp.pitch.ToString() + ", " + local_resp.yaw.ToString();
                 if (_crossbowConnection != null && _crossbowConnection.IsOpen())
                 {
                     line += ", " + _crossbowConnection.GetCurrentDataRads();
