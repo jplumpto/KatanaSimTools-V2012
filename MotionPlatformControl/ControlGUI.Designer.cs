@@ -19,16 +19,16 @@
 
             System.Threading.Thread.Sleep(100);
 
-            if (_crossbowConnection != null)
+            if (_imuConnection != null)
             {
-                _crossbowConnection.Dispose();
-                _crossbowConnection = null;
+                _imuConnection.Dispose();
+                _imuConnection = null;
             }
 
-            if (CrossbowMutex != null)
+            if (ImuMutex != null)
             {
-                CrossbowMutex.Close();
-                CrossbowMutex = null;
+                ImuMutex.Close();
+                ImuMutex = null;
             }
 
             if (InputDataMutex != null)
@@ -154,7 +154,7 @@
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.cmb_Connection = new System.Windows.Forms.ComboBox();
             this.label34 = new System.Windows.Forms.Label();
-            this.CrossbowConnectButton = new System.Windows.Forms.Button();
+            this.ImuConnectButton = new System.Windows.Forms.Button();
             this.label22 = new System.Windows.Forms.Label();
             this.label23 = new System.Windows.Forms.Label();
             this.label24 = new System.Windows.Forms.Label();
@@ -177,7 +177,32 @@
             this.label28 = new System.Windows.Forms.Label();
             this.TimeOffsetText = new System.Windows.Forms.TextBox();
             this.SendDeltaTimeTextbox = new System.Windows.Forms.TextBox();
+            this.ConnectInputUDPButton = new System.Windows.Forms.Button();
+            this.CreateInputDataButton = new System.Windows.Forms.Button();
+            this.label30 = new System.Windows.Forms.Label();
+            this.label35 = new System.Windows.Forms.Label();
             this.label29 = new System.Windows.Forms.Label();
+            this.InputUDPPortBox = new System.Windows.Forms.TextBox();
+            this.XFreqBox = new System.Windows.Forms.TextBox();
+            this.YFreqBox = new System.Windows.Forms.TextBox();
+            this.ZFreqBox = new System.Windows.Forms.TextBox();
+            this.RollFreqBox = new System.Windows.Forms.TextBox();
+            this.PitchFreqBox = new System.Windows.Forms.TextBox();
+            this.YawFreqBox = new System.Windows.Forms.TextBox();
+            this.YawAmpBox = new System.Windows.Forms.TextBox();
+            this.PitchAmpBox = new System.Windows.Forms.TextBox();
+            this.RollAmpBox = new System.Windows.Forms.TextBox();
+            this.ZAmpBox = new System.Windows.Forms.TextBox();
+            this.YAmpBox = new System.Windows.Forms.TextBox();
+            this.XAmpBox = new System.Windows.Forms.TextBox();
+            this.XCheckBox = new System.Windows.Forms.CheckBox();
+            this.YCheckBox = new System.Windows.Forms.CheckBox();
+            this.ZCheckBox = new System.Windows.Forms.CheckBox();
+            this.RollCheckBox = new System.Windows.Forms.CheckBox();
+            this.PitchCheckBox = new System.Windows.Forms.CheckBox();
+            this.YawCheckBox = new System.Windows.Forms.CheckBox();
+            this.label36 = new System.Windows.Forms.Label();
+            this.label37 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -188,7 +213,7 @@
             // AxText
             // 
             this.AxText.BackColor = System.Drawing.Color.White;
-            this.AxText.Location = new System.Drawing.Point(91, 54);
+            this.AxText.Location = new System.Drawing.Point(257, 63);
             this.AxText.Name = "AxText";
             this.AxText.ReadOnly = true;
             this.AxText.Size = new System.Drawing.Size(70, 20);
@@ -197,7 +222,7 @@
             // AyText
             // 
             this.AyText.BackColor = System.Drawing.Color.White;
-            this.AyText.Location = new System.Drawing.Point(91, 80);
+            this.AyText.Location = new System.Drawing.Point(257, 89);
             this.AyText.Name = "AyText";
             this.AyText.ReadOnly = true;
             this.AyText.Size = new System.Drawing.Size(70, 20);
@@ -206,7 +231,7 @@
             // AzText
             // 
             this.AzText.BackColor = System.Drawing.Color.White;
-            this.AzText.Location = new System.Drawing.Point(91, 106);
+            this.AzText.Location = new System.Drawing.Point(257, 115);
             this.AzText.Name = "AzText";
             this.AzText.ReadOnly = true;
             this.AzText.Size = new System.Drawing.Size(70, 20);
@@ -215,7 +240,7 @@
             // ArollText
             // 
             this.ArollText.BackColor = System.Drawing.Color.White;
-            this.ArollText.Location = new System.Drawing.Point(91, 132);
+            this.ArollText.Location = new System.Drawing.Point(257, 141);
             this.ArollText.Name = "ArollText";
             this.ArollText.ReadOnly = true;
             this.ArollText.Size = new System.Drawing.Size(70, 20);
@@ -224,7 +249,7 @@
             // ApitchText
             // 
             this.ApitchText.BackColor = System.Drawing.Color.White;
-            this.ApitchText.Location = new System.Drawing.Point(91, 158);
+            this.ApitchText.Location = new System.Drawing.Point(257, 167);
             this.ApitchText.Name = "ApitchText";
             this.ApitchText.ReadOnly = true;
             this.ApitchText.Size = new System.Drawing.Size(70, 20);
@@ -233,7 +258,7 @@
             // AyawText
             // 
             this.AyawText.BackColor = System.Drawing.Color.White;
-            this.AyawText.Location = new System.Drawing.Point(91, 184);
+            this.AyawText.Location = new System.Drawing.Point(257, 193);
             this.AyawText.Name = "AyawText";
             this.AyawText.ReadOnly = true;
             this.AyawText.Size = new System.Drawing.Size(70, 20);
@@ -242,7 +267,7 @@
             // VpitchText
             // 
             this.VpitchText.BackColor = System.Drawing.Color.White;
-            this.VpitchText.Location = new System.Drawing.Point(91, 236);
+            this.VpitchText.Location = new System.Drawing.Point(257, 245);
             this.VpitchText.Name = "VpitchText";
             this.VpitchText.ReadOnly = true;
             this.VpitchText.Size = new System.Drawing.Size(70, 20);
@@ -251,7 +276,7 @@
             // VrollText
             // 
             this.VrollText.BackColor = System.Drawing.Color.White;
-            this.VrollText.Location = new System.Drawing.Point(91, 210);
+            this.VrollText.Location = new System.Drawing.Point(257, 219);
             this.VrollText.Name = "VrollText";
             this.VrollText.ReadOnly = true;
             this.VrollText.Size = new System.Drawing.Size(70, 20);
@@ -260,7 +285,7 @@
             // VyawText
             // 
             this.VyawText.BackColor = System.Drawing.Color.White;
-            this.VyawText.Location = new System.Drawing.Point(91, 262);
+            this.VyawText.Location = new System.Drawing.Point(257, 271);
             this.VyawText.Name = "VyawText";
             this.VyawText.ReadOnly = true;
             this.VyawText.Size = new System.Drawing.Size(70, 20);
@@ -269,7 +294,7 @@
             // RollText
             // 
             this.RollText.BackColor = System.Drawing.Color.White;
-            this.RollText.Location = new System.Drawing.Point(91, 288);
+            this.RollText.Location = new System.Drawing.Point(257, 297);
             this.RollText.Name = "RollText";
             this.RollText.ReadOnly = true;
             this.RollText.Size = new System.Drawing.Size(70, 20);
@@ -278,7 +303,7 @@
             // PitchText
             // 
             this.PitchText.BackColor = System.Drawing.Color.White;
-            this.PitchText.Location = new System.Drawing.Point(91, 314);
+            this.PitchText.Location = new System.Drawing.Point(257, 323);
             this.PitchText.Name = "PitchText";
             this.PitchText.ReadOnly = true;
             this.PitchText.Size = new System.Drawing.Size(70, 20);
@@ -287,7 +312,7 @@
             // YawText
             // 
             this.YawText.BackColor = System.Drawing.Color.White;
-            this.YawText.Location = new System.Drawing.Point(91, 340);
+            this.YawText.Location = new System.Drawing.Point(257, 349);
             this.YawText.Name = "YawText";
             this.YawText.ReadOnly = true;
             this.YawText.Size = new System.Drawing.Size(70, 20);
@@ -296,7 +321,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(39, 58);
+            this.label1.Location = new System.Drawing.Point(205, 67);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(44, 13);
             this.label1.TabIndex = 2;
@@ -306,7 +331,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(39, 83);
+            this.label2.Location = new System.Drawing.Point(205, 92);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(44, 13);
             this.label2.TabIndex = 2;
@@ -316,7 +341,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(39, 109);
+            this.label3.Location = new System.Drawing.Point(205, 118);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(44, 13);
             this.label3.TabIndex = 2;
@@ -326,7 +351,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(40, 135);
+            this.label4.Location = new System.Drawing.Point(206, 144);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(43, 13);
             this.label4.TabIndex = 2;
@@ -336,7 +361,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(40, 161);
+            this.label5.Location = new System.Drawing.Point(206, 170);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(43, 13);
             this.label5.TabIndex = 2;
@@ -346,7 +371,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(43, 187);
+            this.label6.Location = new System.Drawing.Point(209, 196);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(40, 13);
             this.label6.TabIndex = 2;
@@ -356,7 +381,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(46, 213);
+            this.label7.Location = new System.Drawing.Point(212, 222);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(37, 13);
             this.label7.TabIndex = 2;
@@ -366,7 +391,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(46, 239);
+            this.label8.Location = new System.Drawing.Point(212, 248);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(37, 13);
             this.label8.TabIndex = 2;
@@ -376,7 +401,7 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(49, 265);
+            this.label9.Location = new System.Drawing.Point(215, 274);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(34, 13);
             this.label9.TabIndex = 2;
@@ -386,7 +411,7 @@
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(58, 291);
+            this.label10.Location = new System.Drawing.Point(224, 300);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(25, 13);
             this.label10.TabIndex = 2;
@@ -396,7 +421,7 @@
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(52, 317);
+            this.label11.Location = new System.Drawing.Point(218, 326);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(31, 13);
             this.label11.TabIndex = 2;
@@ -406,7 +431,7 @@
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(55, 343);
+            this.label12.Location = new System.Drawing.Point(221, 352);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(28, 13);
             this.label12.TabIndex = 2;
@@ -416,7 +441,7 @@
             // EngageButton
             // 
             this.EngageButton.Enabled = false;
-            this.EngageButton.Location = new System.Drawing.Point(179, 52);
+            this.EngageButton.Location = new System.Drawing.Point(345, 61);
             this.EngageButton.Name = "EngageButton";
             this.EngageButton.Size = new System.Drawing.Size(75, 23);
             this.EngageButton.TabIndex = 3;
@@ -427,7 +452,7 @@
             // ParkButton
             // 
             this.ParkButton.Enabled = false;
-            this.ParkButton.Location = new System.Drawing.Point(260, 51);
+            this.ParkButton.Location = new System.Drawing.Point(426, 60);
             this.ParkButton.Name = "ParkButton";
             this.ParkButton.Size = new System.Drawing.Size(75, 23);
             this.ParkButton.TabIndex = 3;
@@ -438,7 +463,7 @@
             // StatusText
             // 
             this.StatusText.BackColor = System.Drawing.Color.White;
-            this.StatusText.Location = new System.Drawing.Point(289, 158);
+            this.StatusText.Location = new System.Drawing.Point(455, 167);
             this.StatusText.Name = "StatusText";
             this.StatusText.ReadOnly = true;
             this.StatusText.Size = new System.Drawing.Size(112, 20);
@@ -449,7 +474,7 @@
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(207, 161);
+            this.label13.Location = new System.Drawing.Point(373, 170);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(76, 13);
             this.label13.TabIndex = 2;
@@ -459,7 +484,7 @@
             // ResetButton
             // 
             this.ResetButton.Enabled = false;
-            this.ResetButton.Location = new System.Drawing.Point(260, 80);
+            this.ResetButton.Location = new System.Drawing.Point(426, 89);
             this.ResetButton.Name = "ResetButton";
             this.ResetButton.Size = new System.Drawing.Size(75, 23);
             this.ResetButton.TabIndex = 3;
@@ -469,7 +494,7 @@
             // 
             // DisableButton
             // 
-            this.DisableButton.Location = new System.Drawing.Point(341, 80);
+            this.DisableButton.Location = new System.Drawing.Point(507, 89);
             this.DisableButton.Name = "DisableButton";
             this.DisableButton.Size = new System.Drawing.Size(75, 23);
             this.DisableButton.TabIndex = 3;
@@ -480,7 +505,7 @@
             // label17
             // 
             this.label17.AutoSize = true;
-            this.label17.Location = new System.Drawing.Point(242, 265);
+            this.label17.Location = new System.Drawing.Point(408, 274);
             this.label17.Name = "label17";
             this.label17.Size = new System.Drawing.Size(39, 13);
             this.label17.TabIndex = 14;
@@ -490,7 +515,7 @@
             // label18
             // 
             this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(248, 239);
+            this.label18.Location = new System.Drawing.Point(414, 248);
             this.label18.Name = "label18";
             this.label18.Size = new System.Drawing.Size(33, 13);
             this.label18.TabIndex = 16;
@@ -500,7 +525,7 @@
             // label19
             // 
             this.label19.AutoSize = true;
-            this.label19.Location = new System.Drawing.Point(246, 213);
+            this.label19.Location = new System.Drawing.Point(412, 222);
             this.label19.Name = "label19";
             this.label19.Size = new System.Drawing.Size(35, 13);
             this.label19.TabIndex = 15;
@@ -510,7 +535,7 @@
             // PYawText
             // 
             this.PYawText.BackColor = System.Drawing.Color.White;
-            this.PYawText.Location = new System.Drawing.Point(289, 340);
+            this.PYawText.Location = new System.Drawing.Point(455, 349);
             this.PYawText.Name = "PYawText";
             this.PYawText.ReadOnly = true;
             this.PYawText.Size = new System.Drawing.Size(70, 20);
@@ -519,7 +544,7 @@
             // PPitchText
             // 
             this.PPitchText.BackColor = System.Drawing.Color.White;
-            this.PPitchText.Location = new System.Drawing.Point(289, 314);
+            this.PPitchText.Location = new System.Drawing.Point(455, 323);
             this.PPitchText.Name = "PPitchText";
             this.PPitchText.ReadOnly = true;
             this.PPitchText.Size = new System.Drawing.Size(70, 20);
@@ -528,7 +553,7 @@
             // PRollText
             // 
             this.PRollText.BackColor = System.Drawing.Color.White;
-            this.PRollText.Location = new System.Drawing.Point(289, 288);
+            this.PRollText.Location = new System.Drawing.Point(455, 297);
             this.PRollText.Name = "PRollText";
             this.PRollText.ReadOnly = true;
             this.PRollText.Size = new System.Drawing.Size(70, 20);
@@ -537,7 +562,7 @@
             // PHeaveText
             // 
             this.PHeaveText.BackColor = System.Drawing.Color.White;
-            this.PHeaveText.Location = new System.Drawing.Point(289, 262);
+            this.PHeaveText.Location = new System.Drawing.Point(455, 271);
             this.PHeaveText.Name = "PHeaveText";
             this.PHeaveText.ReadOnly = true;
             this.PHeaveText.Size = new System.Drawing.Size(70, 20);
@@ -546,7 +571,7 @@
             // PSurgeText
             // 
             this.PSurgeText.BackColor = System.Drawing.Color.White;
-            this.PSurgeText.Location = new System.Drawing.Point(289, 210);
+            this.PSurgeText.Location = new System.Drawing.Point(455, 219);
             this.PSurgeText.Name = "PSurgeText";
             this.PSurgeText.ReadOnly = true;
             this.PSurgeText.Size = new System.Drawing.Size(70, 20);
@@ -555,7 +580,7 @@
             // PSwayText
             // 
             this.PSwayText.BackColor = System.Drawing.Color.White;
-            this.PSwayText.Location = new System.Drawing.Point(289, 236);
+            this.PSwayText.Location = new System.Drawing.Point(455, 245);
             this.PSwayText.Name = "PSwayText";
             this.PSwayText.ReadOnly = true;
             this.PSwayText.Size = new System.Drawing.Size(70, 20);
@@ -564,7 +589,7 @@
             // label14
             // 
             this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(253, 347);
+            this.label14.Location = new System.Drawing.Point(419, 356);
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(28, 13);
             this.label14.TabIndex = 19;
@@ -574,7 +599,7 @@
             // label15
             // 
             this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(250, 321);
+            this.label15.Location = new System.Drawing.Point(416, 330);
             this.label15.Name = "label15";
             this.label15.Size = new System.Drawing.Size(31, 13);
             this.label15.TabIndex = 18;
@@ -584,7 +609,7 @@
             // label16
             // 
             this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(256, 295);
+            this.label16.Location = new System.Drawing.Point(422, 304);
             this.label16.Name = "label16";
             this.label16.Size = new System.Drawing.Size(25, 13);
             this.label16.TabIndex = 17;
@@ -594,7 +619,7 @@
             // errorBar
             // 
             this.errorBar.BackColor = System.Drawing.Color.White;
-            this.errorBar.Location = new System.Drawing.Point(42, 387);
+            this.errorBar.Location = new System.Drawing.Point(208, 396);
             this.errorBar.Name = "errorBar";
             this.errorBar.ReadOnly = true;
             this.errorBar.Size = new System.Drawing.Size(359, 20);
@@ -886,7 +911,7 @@
             // label20
             // 
             this.label20.AutoSize = true;
-            this.label20.Location = new System.Drawing.Point(193, 187);
+            this.label20.Location = new System.Drawing.Point(359, 196);
             this.label20.Name = "label20";
             this.label20.Size = new System.Drawing.Size(90, 13);
             this.label20.TabIndex = 2;
@@ -896,7 +921,7 @@
             // RStatusState
             // 
             this.RStatusState.BackColor = System.Drawing.Color.White;
-            this.RStatusState.Location = new System.Drawing.Point(289, 184);
+            this.RStatusState.Location = new System.Drawing.Point(455, 193);
             this.RStatusState.Name = "RStatusState";
             this.RStatusState.ReadOnly = true;
             this.RStatusState.Size = new System.Drawing.Size(112, 20);
@@ -907,7 +932,7 @@
             // RunButton
             // 
             this.RunButton.Enabled = false;
-            this.RunButton.Location = new System.Drawing.Point(179, 80);
+            this.RunButton.Location = new System.Drawing.Point(345, 89);
             this.RunButton.Name = "RunButton";
             this.RunButton.Size = new System.Drawing.Size(75, 23);
             this.RunButton.TabIndex = 3;
@@ -917,7 +942,7 @@
             // 
             // InhibitButton
             // 
-            this.InhibitButton.Location = new System.Drawing.Point(341, 51);
+            this.InhibitButton.Location = new System.Drawing.Point(507, 60);
             this.InhibitButton.Name = "InhibitButton";
             this.InhibitButton.Size = new System.Drawing.Size(75, 23);
             this.InhibitButton.TabIndex = 3;
@@ -928,11 +953,11 @@
             // InputRecordingCheckbox
             // 
             this.InputRecordingCheckbox.AutoSize = true;
-            this.InputRecordingCheckbox.Location = new System.Drawing.Point(314, 4);
+            this.InputRecordingCheckbox.Location = new System.Drawing.Point(240, 25);
             this.InputRecordingCheckbox.Name = "InputRecordingCheckbox";
-            this.InputRecordingCheckbox.Size = new System.Drawing.Size(88, 17);
+            this.InputRecordingCheckbox.Size = new System.Drawing.Size(87, 17);
             this.InputRecordingCheckbox.TabIndex = 24;
-            this.InputRecordingCheckbox.Text = "Record Input";
+            this.InputRecordingCheckbox.Text = "Record Data";
             this.InputRecordingCheckbox.UseVisualStyleBackColor = true;
             this.InputRecordingCheckbox.CheckedChanged += new System.EventHandler(this.InputRecording_CheckedChanged);
             // 
@@ -940,23 +965,29 @@
             // 
             this.MDAFileBox.FormattingEnabled = true;
             this.MDAFileBox.Items.AddRange(new object[] {
-            "101 - Original",
-            "102 - Overtilt",
+            "101",
+            "102",
             "103",
             "104",
             "105",
-            "106"});
-            this.MDAFileBox.Location = new System.Drawing.Point(289, 130);
+            "106",
+            "107",
+            "108",
+            "109",
+            "110",
+            "111",
+            "112"});
+            this.MDAFileBox.Location = new System.Drawing.Point(455, 139);
             this.MDAFileBox.Name = "MDAFileBox";
             this.MDAFileBox.Size = new System.Drawing.Size(95, 21);
             this.MDAFileBox.TabIndex = 25;
-            this.MDAFileBox.Text = "102 - Overtilt";
+            this.MDAFileBox.Text = "103";
             this.MDAFileBox.SelectedIndexChanged += new System.EventHandler(this.MDAFileBox_SelectedIndexChanged);
             // 
             // label21
             // 
             this.label21.AutoSize = true;
-            this.label21.Location = new System.Drawing.Point(228, 135);
+            this.label21.Location = new System.Drawing.Point(394, 144);
             this.label21.Name = "label21";
             this.label21.Size = new System.Drawing.Size(53, 13);
             this.label21.TabIndex = 2;
@@ -969,7 +1000,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.splitContainer1.BackColor = System.Drawing.Color.Transparent;
-            this.splitContainer1.Location = new System.Drawing.Point(422, -2);
+            this.splitContainer1.Location = new System.Drawing.Point(599, -2);
             this.splitContainer1.Name = "splitContainer1";
             // 
             // splitContainer1.Panel1
@@ -982,7 +1013,7 @@
             // 
             this.splitContainer1.Panel2.Controls.Add(this.cmb_Connection);
             this.splitContainer1.Panel2.Controls.Add(this.label34);
-            this.splitContainer1.Panel2.Controls.Add(this.CrossbowConnectButton);
+            this.splitContainer1.Panel2.Controls.Add(this.ImuConnectButton);
             this.splitContainer1.Panel2.Controls.Add(this.label22);
             this.splitContainer1.Panel2.Controls.Add(this.label23);
             this.splitContainer1.Panel2.Controls.Add(this.label24);
@@ -1001,8 +1032,8 @@
             this.splitContainer1.Panel2.Controls.Add(this.xbow_zAccel);
             this.splitContainer1.Panel2.Controls.Add(this.xbow_yAccel);
             this.splitContainer1.Panel2.Controls.Add(this.xbow_xAccel);
-            this.splitContainer1.Size = new System.Drawing.Size(197, 441);
-            this.splitContainer1.SplitterDistance = 25;
+            this.splitContainer1.Size = new System.Drawing.Size(205, 441);
+            this.splitContainer1.SplitterDistance = 28;
             this.splitContainer1.TabIndex = 26;
             // 
             // cmb_Connection
@@ -1018,22 +1049,22 @@
             // 
             this.label34.AutoSize = true;
             this.label34.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label34.Location = new System.Drawing.Point(53, 14);
+            this.label34.Location = new System.Drawing.Point(74, 12);
             this.label34.Name = "label34";
-            this.label34.Size = new System.Drawing.Size(69, 17);
+            this.label34.Size = new System.Drawing.Size(32, 17);
             this.label34.TabIndex = 28;
-            this.label34.Text = "Crossbow";
+            this.label34.Text = "IMU";
             // 
-            // CrossbowConnectButton
+            // ImuConnectButton
             // 
-            this.CrossbowConnectButton.Enabled = false;
-            this.CrossbowConnectButton.Location = new System.Drawing.Point(56, 382);
-            this.CrossbowConnectButton.Name = "CrossbowConnectButton";
-            this.CrossbowConnectButton.Size = new System.Drawing.Size(75, 23);
-            this.CrossbowConnectButton.TabIndex = 27;
-            this.CrossbowConnectButton.Text = "Connect";
-            this.CrossbowConnectButton.UseVisualStyleBackColor = true;
-            this.CrossbowConnectButton.Click += new System.EventHandler(this.CrossbowConnect_Click);
+            this.ImuConnectButton.Enabled = false;
+            this.ImuConnectButton.Location = new System.Drawing.Point(56, 382);
+            this.ImuConnectButton.Name = "ImuConnectButton";
+            this.ImuConnectButton.Size = new System.Drawing.Size(75, 23);
+            this.ImuConnectButton.TabIndex = 27;
+            this.ImuConnectButton.Text = "Connect";
+            this.ImuConnectButton.UseVisualStyleBackColor = true;
+            this.ImuConnectButton.Click += new System.EventHandler(this.CrossbowConnect_Click);
             // 
             // label22
             // 
@@ -1209,18 +1240,18 @@
             // crossbowCheck
             // 
             this.crossbowCheck.AutoSize = true;
-            this.crossbowCheck.Location = new System.Drawing.Point(314, 27);
+            this.crossbowCheck.Location = new System.Drawing.Point(480, 25);
             this.crossbowCheck.Name = "crossbowCheck";
-            this.crossbowCheck.Size = new System.Drawing.Size(102, 17);
+            this.crossbowCheck.Size = new System.Drawing.Size(76, 17);
             this.crossbowCheck.TabIndex = 27;
-            this.crossbowCheck.Text = "Show Crossbow";
+            this.crossbowCheck.Text = "Show IMU";
             this.crossbowCheck.UseVisualStyleBackColor = true;
             this.crossbowCheck.CheckedChanged += new System.EventHandler(this.crossbow_show_panel);
             // 
             // label28
             // 
             this.label28.AutoSize = true;
-            this.label28.Location = new System.Drawing.Point(24, 28);
+            this.label28.Location = new System.Drawing.Point(62, 340);
             this.label28.Name = "label28";
             this.label28.Size = new System.Drawing.Size(59, 13);
             this.label28.TabIndex = 29;
@@ -1230,7 +1261,7 @@
             // TimeOffsetText
             // 
             this.TimeOffsetText.BackColor = System.Drawing.Color.White;
-            this.TimeOffsetText.Location = new System.Drawing.Point(91, 25);
+            this.TimeOffsetText.Location = new System.Drawing.Point(65, 366);
             this.TimeOffsetText.Name = "TimeOffsetText";
             this.TimeOffsetText.ReadOnly = true;
             this.TimeOffsetText.Size = new System.Drawing.Size(70, 20);
@@ -1239,30 +1270,307 @@
             // SendDeltaTimeTextbox
             // 
             this.SendDeltaTimeTextbox.BackColor = System.Drawing.Color.White;
-            this.SendDeltaTimeTextbox.Location = new System.Drawing.Point(238, 25);
+            this.SendDeltaTimeTextbox.Location = new System.Drawing.Point(65, 396);
             this.SendDeltaTimeTextbox.Name = "SendDeltaTimeTextbox";
             this.SendDeltaTimeTextbox.ReadOnly = true;
             this.SendDeltaTimeTextbox.Size = new System.Drawing.Size(70, 20);
             this.SendDeltaTimeTextbox.TabIndex = 30;
             // 
+            // ConnectInputUDPButton
+            // 
+            this.ConnectInputUDPButton.Location = new System.Drawing.Point(12, 38);
+            this.ConnectInputUDPButton.Name = "ConnectInputUDPButton";
+            this.ConnectInputUDPButton.Size = new System.Drawing.Size(75, 23);
+            this.ConnectInputUDPButton.TabIndex = 32;
+            this.ConnectInputUDPButton.Text = "UDP port";
+            this.ConnectInputUDPButton.UseVisualStyleBackColor = true;
+            this.ConnectInputUDPButton.Click += new System.EventHandler(this.ConnectInputUDPButton_Click);
+            // 
+            // CreateInputDataButton
+            // 
+            this.CreateInputDataButton.Location = new System.Drawing.Point(12, 63);
+            this.CreateInputDataButton.Name = "CreateInputDataButton";
+            this.CreateInputDataButton.Size = new System.Drawing.Size(75, 23);
+            this.CreateInputDataButton.TabIndex = 32;
+            this.CreateInputDataButton.Text = "Create";
+            this.CreateInputDataButton.UseVisualStyleBackColor = true;
+            this.CreateInputDataButton.Click += new System.EventHandler(this.CreateInputDataButton_Click);
+            // 
+            // label30
+            // 
+            this.label30.AutoSize = true;
+            this.label30.Location = new System.Drawing.Point(12, 369);
+            this.label30.Name = "label30";
+            this.label30.Size = new System.Drawing.Size(47, 13);
+            this.label30.TabIndex = 33;
+            this.label30.Text = "Receive";
+            // 
+            // label35
+            // 
+            this.label35.AutoSize = true;
+            this.label35.Location = new System.Drawing.Point(12, 399);
+            this.label35.Name = "label35";
+            this.label35.Size = new System.Drawing.Size(32, 13);
+            this.label35.TabIndex = 34;
+            this.label35.Text = "Send";
+            // 
             // label29
             // 
             this.label29.AutoSize = true;
-            this.label29.Location = new System.Drawing.Point(173, 28);
+            this.label29.Location = new System.Drawing.Point(36, 12);
             this.label29.Name = "label29";
-            this.label29.Size = new System.Drawing.Size(59, 13);
-            this.label29.TabIndex = 31;
-            this.label29.Text = "Time offset";
-            this.label29.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.label29.Size = new System.Drawing.Size(68, 13);
+            this.label29.TabIndex = 35;
+            this.label29.Text = "Input Source";
+            // 
+            // InputUDPPortBox
+            // 
+            this.InputUDPPortBox.BackColor = System.Drawing.Color.White;
+            this.InputUDPPortBox.Location = new System.Drawing.Point(93, 40);
+            this.InputUDPPortBox.Name = "InputUDPPortBox";
+            this.InputUDPPortBox.Size = new System.Drawing.Size(70, 20);
+            this.InputUDPPortBox.TabIndex = 28;
+            this.InputUDPPortBox.Text = "5345";
+            this.InputUDPPortBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // XFreqBox
+            // 
+            this.XFreqBox.BackColor = System.Drawing.Color.White;
+            this.XFreqBox.Location = new System.Drawing.Point(132, 142);
+            this.XFreqBox.Name = "XFreqBox";
+            this.XFreqBox.Size = new System.Drawing.Size(51, 20);
+            this.XFreqBox.TabIndex = 28;
+            this.XFreqBox.Text = "0";
+            this.XFreqBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // YFreqBox
+            // 
+            this.YFreqBox.BackColor = System.Drawing.Color.White;
+            this.YFreqBox.Location = new System.Drawing.Point(132, 168);
+            this.YFreqBox.Name = "YFreqBox";
+            this.YFreqBox.Size = new System.Drawing.Size(51, 20);
+            this.YFreqBox.TabIndex = 28;
+            this.YFreqBox.Text = "0";
+            this.YFreqBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // ZFreqBox
+            // 
+            this.ZFreqBox.BackColor = System.Drawing.Color.White;
+            this.ZFreqBox.Location = new System.Drawing.Point(132, 193);
+            this.ZFreqBox.Name = "ZFreqBox";
+            this.ZFreqBox.Size = new System.Drawing.Size(51, 20);
+            this.ZFreqBox.TabIndex = 28;
+            this.ZFreqBox.Text = "0";
+            this.ZFreqBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // RollFreqBox
+            // 
+            this.RollFreqBox.BackColor = System.Drawing.Color.White;
+            this.RollFreqBox.Location = new System.Drawing.Point(132, 219);
+            this.RollFreqBox.Name = "RollFreqBox";
+            this.RollFreqBox.Size = new System.Drawing.Size(51, 20);
+            this.RollFreqBox.TabIndex = 28;
+            this.RollFreqBox.Text = "0";
+            this.RollFreqBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // PitchFreqBox
+            // 
+            this.PitchFreqBox.BackColor = System.Drawing.Color.White;
+            this.PitchFreqBox.Location = new System.Drawing.Point(132, 245);
+            this.PitchFreqBox.Name = "PitchFreqBox";
+            this.PitchFreqBox.Size = new System.Drawing.Size(51, 20);
+            this.PitchFreqBox.TabIndex = 28;
+            this.PitchFreqBox.Text = "0";
+            this.PitchFreqBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // YawFreqBox
+            // 
+            this.YawFreqBox.BackColor = System.Drawing.Color.White;
+            this.YawFreqBox.Location = new System.Drawing.Point(132, 271);
+            this.YawFreqBox.Name = "YawFreqBox";
+            this.YawFreqBox.Size = new System.Drawing.Size(51, 20);
+            this.YawFreqBox.TabIndex = 28;
+            this.YawFreqBox.Text = "0";
+            this.YawFreqBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // YawAmpBox
+            // 
+            this.YawAmpBox.BackColor = System.Drawing.Color.White;
+            this.YawAmpBox.Location = new System.Drawing.Point(75, 271);
+            this.YawAmpBox.Name = "YawAmpBox";
+            this.YawAmpBox.Size = new System.Drawing.Size(51, 20);
+            this.YawAmpBox.TabIndex = 36;
+            this.YawAmpBox.Text = "0";
+            this.YawAmpBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // PitchAmpBox
+            // 
+            this.PitchAmpBox.BackColor = System.Drawing.Color.White;
+            this.PitchAmpBox.Location = new System.Drawing.Point(75, 245);
+            this.PitchAmpBox.Name = "PitchAmpBox";
+            this.PitchAmpBox.Size = new System.Drawing.Size(51, 20);
+            this.PitchAmpBox.TabIndex = 37;
+            this.PitchAmpBox.Text = "0";
+            this.PitchAmpBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // RollAmpBox
+            // 
+            this.RollAmpBox.BackColor = System.Drawing.Color.White;
+            this.RollAmpBox.Location = new System.Drawing.Point(75, 219);
+            this.RollAmpBox.Name = "RollAmpBox";
+            this.RollAmpBox.Size = new System.Drawing.Size(51, 20);
+            this.RollAmpBox.TabIndex = 38;
+            this.RollAmpBox.Text = "0";
+            this.RollAmpBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // ZAmpBox
+            // 
+            this.ZAmpBox.BackColor = System.Drawing.Color.White;
+            this.ZAmpBox.Location = new System.Drawing.Point(75, 193);
+            this.ZAmpBox.Name = "ZAmpBox";
+            this.ZAmpBox.Size = new System.Drawing.Size(51, 20);
+            this.ZAmpBox.TabIndex = 39;
+            this.ZAmpBox.Text = "0";
+            this.ZAmpBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // YAmpBox
+            // 
+            this.YAmpBox.BackColor = System.Drawing.Color.White;
+            this.YAmpBox.Location = new System.Drawing.Point(75, 168);
+            this.YAmpBox.Name = "YAmpBox";
+            this.YAmpBox.Size = new System.Drawing.Size(51, 20);
+            this.YAmpBox.TabIndex = 40;
+            this.YAmpBox.Text = "0";
+            this.YAmpBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // XAmpBox
+            // 
+            this.XAmpBox.BackColor = System.Drawing.Color.White;
+            this.XAmpBox.Location = new System.Drawing.Point(75, 142);
+            this.XAmpBox.Name = "XAmpBox";
+            this.XAmpBox.Size = new System.Drawing.Size(51, 20);
+            this.XAmpBox.TabIndex = 41;
+            this.XAmpBox.Text = "0";
+            this.XAmpBox.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // XCheckBox
+            // 
+            this.XCheckBox.AutoSize = true;
+            this.XCheckBox.Location = new System.Drawing.Point(6, 143);
+            this.XCheckBox.Name = "XCheckBox";
+            this.XCheckBox.Size = new System.Drawing.Size(70, 17);
+            this.XCheckBox.TabIndex = 42;
+            this.XCheckBox.Text = "X (m/s/s)";
+            this.XCheckBox.UseVisualStyleBackColor = true;
+            this.XCheckBox.CheckedChanged += new System.EventHandler(this.XCheckBox_CheckedChanged);
+            // 
+            // YCheckBox
+            // 
+            this.YCheckBox.AutoSize = true;
+            this.YCheckBox.Location = new System.Drawing.Point(6, 169);
+            this.YCheckBox.Name = "YCheckBox";
+            this.YCheckBox.Size = new System.Drawing.Size(70, 17);
+            this.YCheckBox.TabIndex = 42;
+            this.YCheckBox.Text = "Y (m/s/s)";
+            this.YCheckBox.UseVisualStyleBackColor = true;
+            this.YCheckBox.CheckedChanged += new System.EventHandler(this.YCheckBox_CheckedChanged);
+            // 
+            // ZCheckBox
+            // 
+            this.ZCheckBox.AutoSize = true;
+            this.ZCheckBox.Location = new System.Drawing.Point(6, 195);
+            this.ZCheckBox.Name = "ZCheckBox";
+            this.ZCheckBox.Size = new System.Drawing.Size(70, 17);
+            this.ZCheckBox.TabIndex = 42;
+            this.ZCheckBox.Text = "Z (m/s/s)";
+            this.ZCheckBox.UseVisualStyleBackColor = true;
+            this.ZCheckBox.CheckedChanged += new System.EventHandler(this.ZCheckBox_CheckedChanged);
+            // 
+            // RollCheckBox
+            // 
+            this.RollCheckBox.AutoSize = true;
+            this.RollCheckBox.Location = new System.Drawing.Point(6, 221);
+            this.RollCheckBox.Name = "RollCheckBox";
+            this.RollCheckBox.Size = new System.Drawing.Size(68, 17);
+            this.RollCheckBox.TabIndex = 42;
+            this.RollCheckBox.Text = "Roll (rad)";
+            this.RollCheckBox.UseVisualStyleBackColor = true;
+            this.RollCheckBox.CheckedChanged += new System.EventHandler(this.RollCheckBox_CheckedChanged);
+            // 
+            // PitchCheckBox
+            // 
+            this.PitchCheckBox.AutoSize = true;
+            this.PitchCheckBox.Location = new System.Drawing.Point(6, 247);
+            this.PitchCheckBox.Name = "PitchCheckBox";
+            this.PitchCheckBox.Size = new System.Drawing.Size(74, 17);
+            this.PitchCheckBox.TabIndex = 42;
+            this.PitchCheckBox.Text = "Pitch (rad)";
+            this.PitchCheckBox.UseVisualStyleBackColor = true;
+            this.PitchCheckBox.CheckedChanged += new System.EventHandler(this.PitchCheckBox_CheckedChanged);
+            // 
+            // YawCheckBox
+            // 
+            this.YawCheckBox.AutoSize = true;
+            this.YawCheckBox.Location = new System.Drawing.Point(6, 273);
+            this.YawCheckBox.Name = "YawCheckBox";
+            this.YawCheckBox.Size = new System.Drawing.Size(71, 17);
+            this.YawCheckBox.TabIndex = 42;
+            this.YawCheckBox.Text = "Yaw (rad)";
+            this.YawCheckBox.UseVisualStyleBackColor = true;
+            this.YawCheckBox.CheckedChanged += new System.EventHandler(this.YawCheckBox_CheckedChanged);
+            // 
+            // label36
+            // 
+            this.label36.AutoSize = true;
+            this.label36.Location = new System.Drawing.Point(88, 118);
+            this.label36.Name = "label36";
+            this.label36.Size = new System.Drawing.Size(28, 13);
+            this.label36.TabIndex = 35;
+            this.label36.Text = "Amp";
+            // 
+            // label37
+            // 
+            this.label37.AutoSize = true;
+            this.label37.Location = new System.Drawing.Point(139, 110);
+            this.label37.Name = "label37";
+            this.label37.Size = new System.Drawing.Size(38, 26);
+            this.label37.TabIndex = 35;
+            this.label37.Text = "Freq\r\n(rad/s)";
+            this.label37.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // ControlGUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(617, 436);
+            this.ClientSize = new System.Drawing.Size(802, 436);
+            this.Controls.Add(this.XAmpBox);
+            this.Controls.Add(this.YAmpBox);
+            this.Controls.Add(this.ZAmpBox);
+            this.Controls.Add(this.YawAmpBox);
+            this.Controls.Add(this.PitchAmpBox);
+            this.Controls.Add(this.YawCheckBox);
+            this.Controls.Add(this.PitchCheckBox);
+            this.Controls.Add(this.RollCheckBox);
+            this.Controls.Add(this.ZCheckBox);
+            this.Controls.Add(this.YCheckBox);
+            this.Controls.Add(this.XCheckBox);
+            this.Controls.Add(this.RollAmpBox);
+            this.Controls.Add(this.label37);
+            this.Controls.Add(this.label36);
             this.Controls.Add(this.label29);
+            this.Controls.Add(this.label35);
+            this.Controls.Add(this.label30);
+            this.Controls.Add(this.CreateInputDataButton);
+            this.Controls.Add(this.ConnectInputUDPButton);
             this.Controls.Add(this.SendDeltaTimeTextbox);
             this.Controls.Add(this.label28);
+            this.Controls.Add(this.YawFreqBox);
+            this.Controls.Add(this.PitchFreqBox);
+            this.Controls.Add(this.RollFreqBox);
+            this.Controls.Add(this.ZFreqBox);
+            this.Controls.Add(this.YFreqBox);
+            this.Controls.Add(this.XFreqBox);
+            this.Controls.Add(this.InputUDPPortBox);
             this.Controls.Add(this.TimeOffsetText);
             this.Controls.Add(this.crossbowCheck);
             this.Controls.Add(this.splitContainer1);
@@ -1412,7 +1720,7 @@
         private System.Windows.Forms.ComboBox MDAFileBox;
         private System.Windows.Forms.Label label21;
         private System.Windows.Forms.SplitContainer splitContainer1;
-        private System.Windows.Forms.Button CrossbowConnectButton;
+        private System.Windows.Forms.Button ImuConnectButton;
         private System.Windows.Forms.Label label22;
         private System.Windows.Forms.Label label23;
         private System.Windows.Forms.Label label24;
@@ -1437,7 +1745,32 @@
         private System.Windows.Forms.Label label28;
         private System.Windows.Forms.TextBox TimeOffsetText;
         private System.Windows.Forms.TextBox SendDeltaTimeTextbox;
+        private System.Windows.Forms.Button ConnectInputUDPButton;
+        private System.Windows.Forms.Button CreateInputDataButton;
+        private System.Windows.Forms.Label label30;
+        private System.Windows.Forms.Label label35;
         private System.Windows.Forms.Label label29;
+        private System.Windows.Forms.TextBox InputUDPPortBox;
+        private System.Windows.Forms.TextBox XFreqBox;
+        private System.Windows.Forms.TextBox YFreqBox;
+        private System.Windows.Forms.TextBox ZFreqBox;
+        private System.Windows.Forms.TextBox RollFreqBox;
+        private System.Windows.Forms.TextBox PitchFreqBox;
+        private System.Windows.Forms.TextBox YawFreqBox;
+        private System.Windows.Forms.TextBox YawAmpBox;
+        private System.Windows.Forms.TextBox PitchAmpBox;
+        private System.Windows.Forms.TextBox RollAmpBox;
+        private System.Windows.Forms.TextBox ZAmpBox;
+        private System.Windows.Forms.TextBox YAmpBox;
+        private System.Windows.Forms.TextBox XAmpBox;
+        private System.Windows.Forms.CheckBox XCheckBox;
+        private System.Windows.Forms.CheckBox YCheckBox;
+        private System.Windows.Forms.CheckBox ZCheckBox;
+        private System.Windows.Forms.CheckBox RollCheckBox;
+        private System.Windows.Forms.CheckBox PitchCheckBox;
+        private System.Windows.Forms.CheckBox YawCheckBox;
+        private System.Windows.Forms.Label label36;
+        private System.Windows.Forms.Label label37;
     }
 }
 

@@ -12,6 +12,7 @@ using System.Net.Sockets;
 using System.IO.Ports;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using CMT;
 
 namespace MotionPlatformControl
 {
@@ -98,12 +99,14 @@ namespace MotionPlatformControl
         const byte MOOG_NEWMDA = 0x80; //New MDA accelerations
         const byte MOOG_NEWMDAFILE = 0x9B;  //Change MDA File
 
-        private byte[] MOOG_MDAOPTIONS = new byte[6] { 101, 102, 103, 104, 105, 106};
+        private byte[] MOOG_MDAOPTIONS = new byte[13] { 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113};
         private ComboBox.ObjectCollection MOOG_MDAOPTIONSTRINGS = null;
         #endregion
 
         #region Variables
-        private const double GRAVITY = 9.80;
+        private Stopwatch t_prescribedDataStopwatch = new Stopwatch();
+        private CreatedData simulateData = new CreatedData();
+        private const double GRAVITY = 9.80665;
         private const double Deg2Rad = Math.PI / 180.0;
         private double recvDeltaTime = 0;
         private double sendDeltaTime = 0;
@@ -114,23 +117,23 @@ namespace MotionPlatformControl
         private Thread PlatformUDPThread = null;
         private Thread DisplayUpdateThread = null;
         private Thread InputRecordingThread = null;
-        private Thread CrossbowUpdateThread = null;
+        private Thread ImuUpdateThread = null;
         private static Mutex InputDataMutex = new Mutex();
         private static Mutex MOOGMutex = new Mutex();
         private static Mutex UpdateMutex = new Mutex();
-        private static Mutex CrossbowMutex = new Mutex();
+        private static Mutex ImuMutex = new Mutex();
         private bool RecordingUpdate = false;
-        private bool InputUpdate = true;
+        private bool InputUpdate = false;
         private bool PlatformUpdate = true;
         private uint PlatformIO = 0;
         private uint PlatformFault = 0;
         private byte PlatformState = 0;
         private byte PlatformLastState = 16;
         private byte RequestedState = MOOG_NEWMDAFILE;
-        private byte RequestedMDAFile = 102;
+        private byte RequestedMDAFile = 103;
         private MDACommand CurrentMDACommand;
         private MOOGResponse CurrentMOOGResponse;
-        private AhrsSerialData _crossbowConnection = null;
+        private XSens _imuConnection = null;
 
         private int MoogSendStateCount = 0;
         private Stopwatch MoogElapsedSendState = new Stopwatch();
@@ -140,22 +143,37 @@ namespace MotionPlatformControl
         private System.Net.Sockets.UdpClient MOOGPlatformRcvUDP = new System.Net.Sockets.UdpClient(992);
         private int MoogSendTimeOutMS = 16; //ms
 
-        private byte[] XplaneBytes = null;
+        private byte[] InputBytes = null;
+        private int InputUDPPort = 5345;
 
         #endregion //Variables
 
         #region Constructor
         public ControlGUI()
         {
+            if (!InputBox.ShowDialog("Enter Password to Access MOOG Control", "Password Prompt"))
+            {
+                MessageBox.Show("Incorrect Password: Closing Application", "Incorrect Password");
+                Environment.Exit(0);
+                return;
+            }
             InitializeComponent(); //C# automatic form Stuff
             CurrentMDACommand = new MDACommand();
-            XplaneBytes = getBytes(CurrentMDACommand);
+            InputBytes = getBytes(CurrentMDACommand);
             InitLabelArrays();
             InitializeThread();
 
             this.splitContainer1.SplitterDistance = crossbowCheck.Checked ? 0 : 180;
             cmb_Connection.Items.AddRange(SerialPort.GetPortNames());
-            _crossbowConnection = new AhrsSerialData(CrossbowMutex);
+            try
+            {
+                _imuConnection = new XSens(ImuMutex);
+            }
+            catch (SystemException ex)
+            {
+                MessageBox.Show(ex.Message);
+                ImuConnectButton.Enabled = false;
+            }
         }
         #endregion
 
@@ -164,22 +182,7 @@ namespace MotionPlatformControl
         {
             Thread.Sleep(250);
 
-            //Initialize communications with X-Plane
-            try
-            {
-                InputUDPThread = new Thread(new ThreadStart(UpdateUDPInputData));
-                InputUDPThread.IsBackground = true;
-                InputUDPThread.Start();
-            }
-            catch (System.Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-                return;
-            }
-
-            
             //Initialize Communications with Platform
-            
             try
             {
                 PlatformUDPThread = new Thread(new ThreadStart(PlatformCommuncation));
@@ -244,13 +247,81 @@ namespace MotionPlatformControl
         }
         #endregion
 
+        #region Input
+
+        #region Init
+        private void ConnectInputUDPButton_Click(object sender, EventArgs e)
+        {
+            if (!Int32.TryParse(InputUDPPortBox.Text, out InputUDPPort))
+            {
+                InputUDPPort = 5345;
+            } //if
+
+            //Initialize communications with Input UDP
+            try
+            {
+                InputUDPThread = new Thread(new ThreadStart(UpdateUDPInputData));
+                InputUDPThread.IsBackground = true;
+                InputUDPThread.Start();
+            }
+            catch (System.Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                return;
+            }
+
+            InputUDPPortBox.Enabled = false;
+            ConnectInputUDPButton.Enabled = false;
+            CreateInputDataButton.Text = "Stop";
+        }
+
+        private void CreateInputDataButton_Click(object sender, EventArgs e)
+        {
+            if (InputUpdate)
+            {
+                InputUpdate = false;
+                InputUDPPortBox.Enabled = true;
+                ConnectInputUDPButton.Enabled = true;
+                CreateInputDataButton.Text = "Create";
+            }
+            else
+            {
+                //Set Data
+                simulateData.SetXStatus(XCheckBox.Checked, float.Parse(XAmpBox.Text), float.Parse(XFreqBox.Text));
+                simulateData.SetYStatus(YCheckBox.Checked, float.Parse(YAmpBox.Text), float.Parse(YFreqBox.Text));
+                simulateData.SetZStatus(ZCheckBox.Checked, float.Parse(ZAmpBox.Text), float.Parse(ZFreqBox.Text));
+                simulateData.SetRollStatus(RollCheckBox.Checked, float.Parse(RollAmpBox.Text), float.Parse(RollFreqBox.Text));
+                simulateData.SetPitchStatus(PitchCheckBox.Checked, float.Parse(PitchAmpBox.Text), float.Parse(PitchFreqBox.Text));
+                simulateData.SetYawStatus(YawCheckBox.Checked, float.Parse(YawAmpBox.Text), float.Parse(YawFreqBox.Text));
+
+                //Initialize communications with Input UDP
+                try
+                {
+                    InputUDPThread = new Thread(new ThreadStart(UpdateCreatedData));
+                    InputUDPThread.IsBackground = true;
+                    InputUDPThread.Start();
+                }
+                catch (System.Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                    return;
+                }
+
+                InputUDPPortBox.Enabled = false;
+                ConnectInputUDPButton.Enabled = false;
+                CreateInputDataButton.Text = "Stop";
+            }
+            
+        }
+        #endregion
+
         #region InputUDPThread
         /*Function running on InputUDPThread that retrieves 
          *UDP datagrams being sent by UDP meant for the platform */ 
         private void UpdateUDPInputData()
         {
             IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
-            System.Net.Sockets.UdpClient InputUDPClient = new System.Net.Sockets.UdpClient(5345);
+            System.Net.Sockets.UdpClient InputUDPClient = new System.Net.Sockets.UdpClient(InputUDPPort);
 
             //Stopwatch freqTimer = new Stopwatch();
             //double currentFrequency = 0.0;
@@ -261,6 +332,7 @@ namespace MotionPlatformControl
             UpdateMutex.ReleaseMutex();
 
             //freqTimer.Start();
+            InputUpdate = true;
 
             while (InputUpdate)
             {
@@ -281,21 +353,10 @@ namespace MotionPlatformControl
                         }
 
                         InputDataMutex.WaitOne();
-                        XplaneBytes = recvBytes;
+                        InputBytes = recvBytes;
                         InputDataMutex.ReleaseMutex();
 
                         recvDeltaTime = secs - BitConverter.ToDouble(recvBytes, Time_Offset);
-
-                        //recvCount++;
-                        //if (recvCount >= 500)
-                        //{
-                        //    long elapsedTime = freqTimer.ElapsedMilliseconds;
-                        //    currentFrequency = 1000.0 * recvCount / elapsedTime;
-                        //    recvCount = 0;
-                        //    freqTimer.Reset();
-                        //    freqTimer.Start();
-                        //    errorBar.BeginInvoke(new InvokeDelegateString(ErrorBarMessage), "Freq: " + currentFrequency.ToString("000.00") + " Hz");
-                        //}
                     }
                     catch (System.Exception ex)
                     {
@@ -314,8 +375,54 @@ namespace MotionPlatformControl
 
             InputUDPClient.Close();
         }
+        #endregion
 
-        
+        #region CreateDataThread
+        private void UpdateCreatedData()
+        {
+            byte LocalRequestedState = 0;
+            MDACommand localMDA = new MDACommand();
+            InputUpdate = true;
+            t_prescribedDataStopwatch.Start();
+
+            localMDA = simulateData.UpdateData(0);
+            byte[] recvBytes = getBytes(localMDA);
+            
+            InputDataMutex.WaitOne();
+            InputBytes = recvBytes;
+            InputDataMutex.ReleaseMutex();
+
+            UpdateMutex.WaitOne();
+            LocalRequestedState = RequestedState;
+            UpdateMutex.ReleaseMutex();
+
+            while (InputUpdate)
+            {
+                localMDA = simulateData.UpdateData(1.0f * t_prescribedDataStopwatch.ElapsedMilliseconds / 1000);
+                recvBytes = getBytes(localMDA);
+
+                if (LocalRequestedState == MOOG_NEWMDA && MoogElapsedSendState.ElapsedMilliseconds >= MoogSendTimeOutMS)
+                {
+                    //Send updated state
+                    SendState(MOOGPlatformRcvUDP, MOOGhostname, MOOGdestport, recvBytes);
+                    MoogSendStateCount++;
+                    MoogElapsedSendState.Reset();
+                    MoogElapsedSendState.Start();
+                }
+
+                InputDataMutex.WaitOne();
+                InputBytes = recvBytes;
+                InputDataMutex.ReleaseMutex();
+
+                UpdateMutex.WaitOne();
+                LocalRequestedState = RequestedState;
+                UpdateMutex.ReleaseMutex();
+            }
+
+            t_prescribedDataStopwatch.Reset();
+        }
+        #endregion
+
         #endregion
 
         #region PlatformThread
@@ -325,6 +432,7 @@ namespace MotionPlatformControl
         {
             Stopwatch freqTimer = new Stopwatch();
             Stopwatch elapsedTimer = new Stopwatch();
+            Stopwatch recvTimer = new Stopwatch();
             double currentFrequency = 0.0;
             int sendCount = 0;
             
@@ -342,6 +450,7 @@ namespace MotionPlatformControl
             byte lastMDAFile = 101;
             freqTimer.Start();
             elapsedTimer.Start();
+            recvTimer.Start();
 
             #region Loop
             while (PlatformUpdate)
@@ -355,7 +464,8 @@ namespace MotionPlatformControl
                         MOOGResponse platformResp = fromMOOGBytes(recvBytes);
 
                         //check for faults?
-                        
+
+
                         //Update Status
                         //UpdateFeedbackState(platformResp);
                         MOOGMutex.WaitOne();
@@ -378,7 +488,7 @@ namespace MotionPlatformControl
                                 MessageBox.Show(ex.Message, "Change of MDA File Error");
                             }
                         }
-                        
+
 
                         PlatformFault = platformResp.fault;
                         PlatformIO = platformResp.io_info;
@@ -387,7 +497,7 @@ namespace MotionPlatformControl
                         //Update displayed state
                         if (PlatformState != PlatformLastState && StatusText != null)
                         {
-                            try 
+                            try
                             {
                                 StatusText.BeginInvoke(new InvokeDelegateState(UpdatePlatformState), PlatformState);
                             }
@@ -396,13 +506,27 @@ namespace MotionPlatformControl
                                 MessageBox.Show(ex.Message, "Status Update Error");
                             }
                         }
+
+                        // Reset Timer
+                        recvTimer.Reset();
+                        recvTimer.Start();
                     }
                     catch (System.Exception ex)
                     {
-                        MessageBox.Show(ex.Message,"Platform Receiving Communication Error");
+                        MessageBox.Show(ex.Message, "Platform Receiving Communication Error");
                         break;
                     }
                 } //if
+                else if (recvTimer.ElapsedMilliseconds > 3000 && PlatformState != (byte)MachineStates.DISABLED)
+                {
+                    // Haven't heard from the platform in a long while
+                    PlatformState = (byte) MachineStates.DISABLED;
+                    StatusText.BeginInvoke(new InvokeDelegateState(UpdatePlatformState), PlatformState);
+                    
+                    // Reset Timer
+                    recvTimer.Reset();
+                    recvTimer.Start();
+                } //else
                 #endregion
 
                 UpdateMutex.WaitOne();
@@ -430,7 +554,7 @@ namespace MotionPlatformControl
                                 {
                                     //Send updated state
                                     InputDataMutex.WaitOne();
-                                    byte[] localBytes = XplaneBytes;
+                                    byte[] localBytes = InputBytes;
                                     InputDataMutex.ReleaseMutex();
                                     SendState(MOOGPlatformRcvUDP, MOOGhostname, MOOGdestport,localBytes);
                                     //SendCommand(MOOG_MDAMODE, MOOGPlatformRcvUDP, MOOGhostname, MOOGdestport);
@@ -632,19 +756,22 @@ namespace MotionPlatformControl
 
                     UpdateFeedbackState(local_resp);
 
-                    InputDataMutex.WaitOne();
-                    //MDACommand LocalMDACommand = CurrentMDACommand;
-                    MDACommand LocalMDACommand = fromBytes(XplaneBytes);
-                    InputDataMutex.ReleaseMutex();
+                    if (InputUpdate)
+                    {
+                        InputDataMutex.WaitOne();
+                        //MDACommand LocalMDACommand = CurrentMDACommand;
+                        MDACommand LocalMDACommand = fromBytes(InputBytes);
+                        InputDataMutex.ReleaseMutex();
 
-                    UpdateCommandDataDisplay(LocalMDACommand);
+                        UpdateCommandDataDisplay(LocalMDACommand);
+                    }
 
-                    if (_crossbowConnection != null && _crossbowConnection.IsOpen())
+                    if (_imuConnection != null && _imuConnection.IsOpen())
                     {
                         UpdateCrossbowDisplay();
                     }
 
-                    Thread.Sleep(50);
+                    Thread.Sleep(100);
 
                 }
                 catch (System.Exception ex)
@@ -676,17 +803,26 @@ namespace MotionPlatformControl
 
         private void UpdateCrossbowDisplay()
         {
-            AHRSDataPacket tmpCrossbowPacket = _crossbowConnection.GetData();
+            XSens.ImuDataPacket tmpCrossbowPacket = _imuConnection.GetData();
 
-            xbow_xAccel.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), xbow_xAccel, (tmpCrossbowPacket.a_x*GRAVITY).ToString("0.000"));
-            xbow_yAccel.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), xbow_yAccel, (tmpCrossbowPacket.a_y*GRAVITY).ToString("0.000"));
-            xbow_zAccel.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), xbow_zAccel, (tmpCrossbowPacket.a_z*GRAVITY).ToString("0.000"));
-            xbow_pVelo.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), xbow_pVelo, (tmpCrossbowPacket.v_roll * Deg2Rad).ToString("0.000"));
-            xbow_qVelo.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), xbow_qVelo, (tmpCrossbowPacket.v_pitch*Deg2Rad).ToString("0.000"));
-            xbow_rVelo.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), xbow_rVelo, (tmpCrossbowPacket.v_yaw*Deg2Rad).ToString("0.000"));
-            xbow_roll.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), xbow_roll, (tmpCrossbowPacket.roll*Deg2Rad).ToString("0.000"));
-            xbow_pitch.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), xbow_pitch, (tmpCrossbowPacket.pitch*Deg2Rad).ToString("0.000"));
-            xbow_yaw.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), xbow_yaw, (tmpCrossbowPacket.yaw*Deg2Rad).ToString("0.000"));
+            //xbow_xAccel.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), xbow_xAccel, (tmpCrossbowPacket.a_x).ToString("0.000"));
+            //xbow_yAccel.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), xbow_yAccel, (tmpCrossbowPacket.a_y).ToString("0.000"));
+            //xbow_zAccel.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), xbow_zAccel, (tmpCrossbowPacket.a_z).ToString("0.000"));
+            //xbow_pVelo.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), xbow_pVelo, (tmpCrossbowPacket.v_roll * Deg2Rad).ToString("0.000"));
+            //xbow_qVelo.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), xbow_qVelo, (tmpCrossbowPacket.v_pitch*Deg2Rad).ToString("0.000"));
+            //xbow_rVelo.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), xbow_rVelo, (tmpCrossbowPacket.v_yaw*Deg2Rad).ToString("0.000"));
+            //xbow_roll.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), xbow_roll, (tmpCrossbowPacket.roll*Deg2Rad).ToString("0.000"));
+            //xbow_pitch.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), xbow_pitch, (tmpCrossbowPacket.pitch*Deg2Rad).ToString("0.000"));
+            //xbow_yaw.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), xbow_yaw, (tmpCrossbowPacket.yaw*Deg2Rad).ToString("0.000"));
+            xbow_xAccel.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), xbow_xAccel, (tmpCrossbowPacket.a_x).ToString("0.000"));
+            xbow_yAccel.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), xbow_yAccel, (tmpCrossbowPacket.a_y).ToString("0.000"));
+            xbow_zAccel.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), xbow_zAccel, (tmpCrossbowPacket.a_z).ToString("0.000"));
+            xbow_pVelo.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), xbow_pVelo, (tmpCrossbowPacket.v_roll ).ToString("0.000"));
+            xbow_qVelo.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), xbow_qVelo, (tmpCrossbowPacket.v_pitch ).ToString("0.000"));
+            xbow_rVelo.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), xbow_rVelo, (tmpCrossbowPacket.v_yaw ).ToString("0.000"));
+            xbow_roll.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), xbow_roll, (tmpCrossbowPacket.roll ).ToString("0.000"));
+            xbow_pitch.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), xbow_pitch, (tmpCrossbowPacket.pitch ).ToString("0.000"));
+            xbow_yaw.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), xbow_yaw, (tmpCrossbowPacket.yaw ).ToString("0.000"));
         }
         #endregion
 
@@ -1099,7 +1235,8 @@ namespace MotionPlatformControl
                     ResetButton.Enabled = false;
                     ParkButton.Enabled = true;
                     InhibitButton.Enabled = false;
-                    RunButton.Enabled = true;
+                    //RunButton.Enabled = true;
+                    RunButton.Enabled = InputUpdate; //Ensures Run is only available if we have data
                     MDAFileBox.Enabled = false;
                     //Display feedback data
                     break;
@@ -1153,6 +1290,7 @@ namespace MotionPlatformControl
                     RunButton.Enabled = false;
                     MDAFileBox.Enabled = false;
                     RunButton.Text = "Run";
+                    RequestedState = MOOG_PARK;
                     break;
                 case (byte)MachineStates.DISABLED:
                     //Warn user a hard reset is required
@@ -1163,6 +1301,7 @@ namespace MotionPlatformControl
                     RunButton.Enabled = false;
                     MDAFileBox.Enabled = false;
                     RunButton.Text = "Run";
+                    RequestedState = MOOG_PARK;
                     break;
             }
         }
@@ -1256,9 +1395,9 @@ namespace MotionPlatformControl
             string line;
             line = "Elapsed Time (ms), X Acceleration (m/s/s), Y Acceleration (m/s/s) , Z Acceleration (m/s/s) , Roll (rad) , Pitch (rad) , Yaw (rad) , Roll Velocity (rad/s) , Pitch Velocity (rad/s) , Yaw Velocity (rad/s) , Roll Acceleration (rad/s/s) , Pitch Acceleration (rad/s/s) , Yaw Acceleration (rad/s/s)";
             line += ", Moog Roll (rad), Moog Pitch (rad), Moog Yaw (rad)";
-            if (_crossbowConnection != null && _crossbowConnection.IsOpen())
+            if (_imuConnection != null && _imuConnection.IsOpen())
             {
-                line += ", " + _crossbowConnection.GetLineFormatRads();
+                line += ", " + _imuConnection.GetLineFormatRads();
             } 
             file.WriteLine(line);
             file.Flush();
@@ -1270,7 +1409,7 @@ namespace MotionPlatformControl
                 System.Threading.Thread.Sleep(20);
 
                 InputDataMutex.WaitOne();
-                byte[] dataBytes = XplaneBytes; 
+                byte[] dataBytes = InputBytes; 
                 InputDataMutex.ReleaseMutex();
                 MDACommand data = fromBytes(dataBytes);
                 
@@ -1281,9 +1420,9 @@ namespace MotionPlatformControl
                 
                 line = elapsedTimer.ElapsedMilliseconds.ToString() + ", " + data.a_x.ToString() + ", " + data.a_y.ToString() + ", " + data.a_z.ToString() + ", " + data.roll.ToString() + ", " + data.pitch.ToString() + ", " + data.yaw.ToString() + ", " + data.v_roll.ToString() + ", " + data.v_pitch.ToString() + ", " + data.v_yaw.ToString() + ", " + data.a_roll.ToString() + ", " + data.a_pitch.ToString() + ", " + data.a_yaw.ToString();
                 line += ", " + local_resp.roll.ToString() + ", " + local_resp.pitch.ToString() + ", " + local_resp.yaw.ToString();
-                if (_crossbowConnection != null && _crossbowConnection.IsOpen())
+                if (_imuConnection != null && _imuConnection.IsOpen())
                 {
-                    line += ", " + _crossbowConnection.GetCurrentDataRads();
+                    line += ", " + _imuConnection.GetCurrentDataRads();
                 } 
 
                 file.WriteLine(line);
@@ -1338,10 +1477,10 @@ namespace MotionPlatformControl
         }
         #endregion
 
-        #region CrossbowConnect
+        #region ImuConnect
         private void cmb_Connection_SelectedIndexChanged(object sender, EventArgs e)
         {
-            CrossbowConnectButton.Enabled = true;
+            ImuConnectButton.Enabled = true;
         }
 
         private void crossbow_show_panel(object sender, EventArgs e)
@@ -1351,40 +1490,120 @@ namespace MotionPlatformControl
 
         private void CrossbowConnect_Click(object sender, EventArgs e)
         {
-            if (_crossbowConnection != null && _crossbowConnection.IsOpen())
+            if (_imuConnection != null && _imuConnection.IsOpen())
             {
                 //Disconnect
-                _crossbowConnection.DisconnectSerial();
-                CrossbowConnectButton.Text = "Connect";
+                _imuConnection.DisconnectSerial();
+                ImuConnectButton.Text = "Connect";
             }
             else
             {
                 //Connect
                 string portName = cmb_Connection.Text;
-                SerialStatus stat = _crossbowConnection.ConnectSerial(portName, 38400);
+                XSens.SerialStatus stat = _imuConnection.ConnectSerial(portName, 38400);
                                 
                 switch (stat)
                 {
-                    case SerialStatus.SUCCESS:
+                    case XSens.SerialStatus.SUCCESS:
                         //Console.WriteLine("Successfully connected to AHRS.");
                         break;
-                    case SerialStatus.PING_RESPONSE_FAILURE:
-                    case SerialStatus.CONNECTION_FAILURE:
-                    case SerialStatus.PACKET_SIZE_MISSMATCH:
+                    case XSens.SerialStatus.PING_RESPONSE_FAILURE:
+                    case XSens.SerialStatus.CONNECTION_FAILURE:
+                    case XSens.SerialStatus.PACKET_SIZE_MISSMATCH:
                         //Console.WriteLine(_crossbowConnection.GetErrorMessage());
-                        MessageBox.Show("Failed to connect:" + _crossbowConnection.GetErrorMessage());
+                        MessageBox.Show("Failed to connect:" + _imuConnection.GetErrorMessage());
                         return;
+                    case XSens.SerialStatus.NO_DEVICES_FOUND:
+                        MessageBox.Show(_imuConnection.GetErrorMessage());
+                        break;
                 }
 
                 //Initiate thread for receiving data
-                CrossbowUpdateThread = new Thread(new ThreadStart(_crossbowConnection.MonitorSerial));
-                CrossbowUpdateThread.IsBackground = true;
-                CrossbowUpdateThread.Start();
+                ImuUpdateThread = new Thread(new ThreadStart(_imuConnection.MonitorSerial));
+                ImuUpdateThread.IsBackground = true;
+                ImuUpdateThread.Start();
 
-                CrossbowConnectButton.Text = "Disconnect";
+                ImuConnectButton.Text = "Disconnect";
             }
         }
         #endregion
+
+        private void XCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            float phase = 0.0f;
+            float frequency = float.Parse(XFreqBox.Text);
+            if (t_prescribedDataStopwatch.IsRunning)
+            {
+                phase = frequency * (1.0f * t_prescribedDataStopwatch.ElapsedMilliseconds) / 1000;
+            }
+
+            simulateData.SetXStatus(XCheckBox.Checked, float.Parse(XAmpBox.Text), frequency, phase);
+            
+        }
+
+        private void YCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            float phase = 0.0f;
+            float frequency = float.Parse(YFreqBox.Text);
+            if (t_prescribedDataStopwatch.IsRunning)
+            {
+                phase = frequency * (1.0f * t_prescribedDataStopwatch.ElapsedMilliseconds) / 1000;
+            }
+
+            simulateData.SetYStatus(YCheckBox.Checked, float.Parse(YAmpBox.Text), frequency, phase);
+            
+        }
+
+        private void ZCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            float phase = 0.0f;
+            float frequency = float.Parse(ZFreqBox.Text);
+            if (t_prescribedDataStopwatch.IsRunning)
+            {
+                phase = frequency * (1.0f * t_prescribedDataStopwatch.ElapsedMilliseconds) / 1000;
+            }
+
+            simulateData.SetZStatus(ZCheckBox.Checked, float.Parse(ZAmpBox.Text), frequency, phase);
+            
+        }
+
+        private void RollCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            float phase = 0.0f;
+            float frequency = float.Parse(RollFreqBox.Text);
+            if (t_prescribedDataStopwatch.IsRunning)
+            {
+                phase = frequency * (1.0f * t_prescribedDataStopwatch.ElapsedMilliseconds) / 1000;
+            }
+
+            simulateData.SetRollStatus(RollCheckBox.Checked, float.Parse(RollAmpBox.Text), frequency, phase);
+            
+        }
+
+        private void PitchCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            float phase = 0.0f;
+            float frequency = float.Parse(PitchFreqBox.Text);
+            if (t_prescribedDataStopwatch.IsRunning)
+            {
+                phase = frequency * (1.0f * t_prescribedDataStopwatch.ElapsedMilliseconds) / 1000;
+            }
+
+            simulateData.SetPitchStatus(PitchCheckBox.Checked, float.Parse(PitchAmpBox.Text), frequency, phase);
+            
+        }
+
+        private void YawCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            float phase = 0.0f;
+            float frequency = float.Parse(YawFreqBox.Text);
+            if (t_prescribedDataStopwatch.IsRunning)
+            {
+                phase = frequency * (1.0f * t_prescribedDataStopwatch.ElapsedMilliseconds) / 1000;
+            }
+
+            simulateData.SetYawStatus(YawCheckBox.Checked, float.Parse(YawAmpBox.Text), frequency, phase);
+        }
 
         #region UnitConversion
 

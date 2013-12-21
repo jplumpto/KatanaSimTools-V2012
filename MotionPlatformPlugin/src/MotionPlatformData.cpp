@@ -376,9 +376,9 @@ void MPD_GetMotionData(void)
 	MPD_MDACommand->pitch	= theta * DEG_TO_RADS;
 	MPD_MDACommand->yaw		= psi * DEG_TO_RADS;
 
-	MPD_MDACommand->a_x		= a_axil;
+	MPD_MDACommand->a_x		= -1.0 * a_axil;
 	MPD_MDACommand->a_y		= a_side;
-	MPD_MDACommand->a_z		= a_nrml;
+	MPD_MDACommand->a_z		= a_nrml - MPD_LocalGravity;
 
 	//Buffeting - Assume 0 for now
 	MPD_MDACommand->v_vehicle = TAS;

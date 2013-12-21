@@ -636,12 +636,12 @@ namespace MotionPlatformControl
             m_data.pitch = 1.0 * data[1] * (180) / (1 << 15);
             m_data.yaw = 1.0 * data[2] * (180) / (1 << 15);
 
-            //Angular rate = data * (AR * 1.5) / 2^15
+            //Angular rate = data * (AR * 1.5) / 2^15 ; AR = +/- 200 deg/s
             m_data.v_roll = 1.0 * data[3] * (200 * 1.5) / (1 << 15);
             m_data.v_pitch = 1.0 * data[4] * (200 * 1.5) / (1 << 15);
             m_data.v_yaw = 1.0 * data[5] * (200 * 1.5) / (1 << 15);
 
-            //Accel = data * (GR * 1.5) / 2^15
+            //Accel = data * (GR * 1.5) / 2^15 ; GR = +/- 4G
             m_data.a_x = 1.0 * data[6] * (4 * 1.5) / (1 << 15);
             m_data.a_y = 1.0 * data[7] * (4 * 1.5) / (1 << 15);
             m_data.a_z = 1.0 * data[8] * (4 * 1.5) / (1 << 15);
