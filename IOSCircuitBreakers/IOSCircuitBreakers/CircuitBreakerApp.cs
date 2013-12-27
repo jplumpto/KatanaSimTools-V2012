@@ -38,7 +38,7 @@ namespace IOSCircuitBreakers
         #region Arduino
         private void find_arduino()
         {
-            _arduinoCompileDate.Text = "False";
+            _arduinoCompileDate.Text = "December 1, 2013";
             try
             {
                 ManagementObjectSearcher searcher =
