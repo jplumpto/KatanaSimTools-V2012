@@ -11,6 +11,7 @@ namespace MotionPlatformControl
         private const double GRAVITY = 0;
         private float f_lastTime = 0.0f;
         private const float f_PHASEOUTMAG = 0.75f;
+        private bool sinusoidalFunction = true;
         #region ActiveBools
         private bool b_xActive = false;
         private bool b_yActive = false;
@@ -47,6 +48,11 @@ namespace MotionPlatformControl
         public CreatedData()
         {
             localStr.MCW = 0x80; //New MDA accelerations
+        }
+
+        public void SetFunction(bool sinusoidal)
+        {
+            sinusoidalFunction = sinusoidal;
         }
 
         public void SetXStatus(bool active, float amplitude = 0.0f, float frequency = 0.0f, float phase = 0.0f)
@@ -121,7 +127,15 @@ namespace MotionPlatformControl
 
             if (b_xActive)
             {
-                localStr.a_x = f_xAmp * (float)Math.Sin(f_xFreq * f_timeSeconds - f_xPhase);
+                if (sinusoidalFunction)
+                    localStr.a_x = f_xAmp * (float)Math.Sin(f_xFreq * f_timeSeconds - f_xPhase);
+                else
+                {
+                    if (localStr.a_x < f_xAmp)
+                    {
+                        localStr.a_x += f_xFreq * dt;
+                    }
+                }
             }
             else if (0.2 < Math.Abs(localStr.a_x))
             {
@@ -134,7 +148,15 @@ namespace MotionPlatformControl
 
             if (b_yActive)
             {
-                localStr.a_y = f_yAmp * (float)Math.Sin(f_yFreq * f_timeSeconds - f_yPhase);
+                if (sinusoidalFunction)
+                    localStr.a_y = f_yAmp * (float)Math.Sin(f_yFreq * f_timeSeconds - f_yPhase);
+                else
+                {
+                    if (localStr.a_y < f_yAmp)
+                    {
+                        localStr.a_y += f_yFreq * dt;
+                    }
+                }
             }
             else if (0.2 < Math.Abs(localStr.a_y))
             {
@@ -147,7 +169,15 @@ namespace MotionPlatformControl
 
             if (b_zActive)
             {
-                localStr.a_z = f_zAmp * (float)Math.Sin(f_zFreq * f_timeSeconds - f_zPhase) + (float)GRAVITY;
+                if (sinusoidalFunction)
+                    localStr.a_z = f_zAmp * (float)Math.Sin(f_zFreq * f_timeSeconds - f_zPhase) + (float)GRAVITY;
+                else
+                {
+                    if (localStr.a_z < f_zAmp)
+                    {
+                        localStr.a_z += f_zFreq * dt;
+                    }
+                }
             }
             else if (0.2 < Math.Abs(localStr.a_x - (float)GRAVITY))
             {

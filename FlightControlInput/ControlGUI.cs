@@ -114,14 +114,17 @@ namespace FlightControlInput
         private Thread MotionInputUDPThread = null;
         private Thread DisplayUpdateThread = null;
         private Thread InputRecordingThread = null;
+        private Thread ImuUpdateThread = null;
         private static Mutex InputDataMutex = new Mutex();
         private static Mutex MotionInputMutex = new Mutex();
         private static Mutex UpdateMutex = new Mutex();
+        private static Mutex ImuMutex = new Mutex();
         private bool RecordingUpdate = false;
         private bool ControlInputUpdate = false;
         private bool MotionInputUpdate = false;
         private bool DisplayUpdate = true;
         private byte ControlInputMode = 0; // 0 - Controller, 1 - Sinusoidal
+        private XSens _imuConnection = null;
         
         private MDACommand CurrentMDACommand;
         private float PitchRatio = 0.0f;
@@ -248,7 +251,7 @@ namespace FlightControlInput
         }
         #endregion
 
-        #region InputUDPThread
+        #region MotionInputUDPThread
         /*Function running on InputUDPThread that retrieves 
          *UDP datagrams being sent by UDP meant for the platform */ 
         private void UpdateUDPInputData()
@@ -324,7 +327,52 @@ namespace FlightControlInput
 
         #endregion
 
-       
+        #region ImuConnect
+        private void cmb_Connection_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ImuConnectButton.Enabled = true;
+        }
+
+        private void AhrsConnect_Click(object sender, EventArgs e)
+        {
+            if (_imuConnection != null && _imuConnection.IsOpen())
+            {
+                //Disconnect
+                _imuConnection.DisconnectSerial();
+                ImuConnectButton.Text = "Connect";
+            }
+            else
+            {
+                //Connect
+                string portName = cmb_Connection.Text;
+                XSens.SerialStatus stat = _imuConnection.ConnectSerial(portName, 38400);
+
+                switch (stat)
+                {
+                    case XSens.SerialStatus.SUCCESS:
+                        //Console.WriteLine("Successfully connected to AHRS.");
+                        break;
+                    case XSens.SerialStatus.PING_RESPONSE_FAILURE:
+                    case XSens.SerialStatus.CONNECTION_FAILURE:
+                    case XSens.SerialStatus.PACKET_SIZE_MISSMATCH:
+                        //Console.WriteLine(_crossbowConnection.GetErrorMessage());
+                        MessageBox.Show("Failed to connect:" + _imuConnection.GetErrorMessage());
+                        return;
+                    case XSens.SerialStatus.NO_DEVICES_FOUND:
+                        MessageBox.Show(_imuConnection.GetErrorMessage());
+                        break;
+                }
+
+                //Initiate thread for receiving data
+                ImuUpdateThread = new Thread(new ThreadStart(_imuConnection.MonitorSerial));
+                ImuUpdateThread.IsBackground = true;
+                ImuUpdateThread.Start();
+
+                ImuConnectButton.Text = "Disconnect";
+            }
+        }
+        #endregion
+
         #region UpdateDisplayThread
         private void UpdateDisplays()
         {
@@ -363,7 +411,12 @@ namespace FlightControlInput
                         UpdateCommandDataDisplay(LocalMDACommand);
                     }
 
-                    Thread.Sleep(10);
+                    if (_imuConnection != null && _imuConnection.IsOpen())
+                    {
+                        UpdateAhrsDisplay();
+                    }
+
+                    Thread.Sleep(50);
 
                 }
                 catch (System.Exception ex)
@@ -375,7 +428,20 @@ namespace FlightControlInput
             }
         }
 
-        
+        private void UpdateAhrsDisplay()
+        {
+            XSens.ImuDataPacket tmpAhrsPacket = _imuConnection.GetData();
+
+            xbow_xAccel.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), xbow_xAccel, (tmpAhrsPacket.a_x).ToString("0.000"));
+            xbow_yAccel.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), xbow_yAccel, (tmpAhrsPacket.a_y).ToString("0.000"));
+            xbow_zAccel.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), xbow_zAccel, (tmpAhrsPacket.a_z).ToString("0.000"));
+            xbow_pVelo.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), xbow_pVelo, (tmpAhrsPacket.v_roll).ToString("0.000"));
+            xbow_qVelo.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), xbow_qVelo, (tmpAhrsPacket.v_pitch).ToString("0.000"));
+            xbow_rVelo.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), xbow_rVelo, (tmpAhrsPacket.v_yaw).ToString("0.000"));
+            xbow_roll.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), xbow_roll, (tmpAhrsPacket.roll).ToString("0.000"));
+            xbow_pitch.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), xbow_pitch, (tmpAhrsPacket.pitch).ToString("0.000"));
+            xbow_yaw.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), xbow_yaw, (tmpAhrsPacket.yaw).ToString("0.000"));
+        }
         #endregion
 
         #region DisplayedState
@@ -402,6 +468,13 @@ namespace FlightControlInput
             YawText.BeginInvoke(new InvokeDelegateFloat(UpdateYaw), LocalMDACommand.yaw);
 
             TimeOffsetText.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), TimeOffsetText, recvDeltaTime.ToString("0.000"));
+
+            if (LocalMDACommand.MCW == 0x36) //Control Input Data sent also
+            {
+                XPRollRatioText.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), XPRollRatioText, (LocalMDACommand.buffet_roll).ToString());
+                XPPitchRatioText.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), XPPitchRatioText, (LocalMDACommand.buffet_pitch).ToString());
+                XPYawRatioText.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), XPYawRatioText, (LocalMDACommand.buffet_yaw).ToString());
+            }
 
         }
         private void UpdateLabelStatus(Label localLabel,bool enabled)
@@ -655,11 +728,18 @@ namespace FlightControlInput
             //open text file
             Stopwatch elapsedTimer = new Stopwatch();
             DateTime currentTime = DateTime.Now;
-            string filename = "XPlaneFlightData_" + currentTime.Year.ToString("0000") + currentTime.Month.ToString("00") + currentTime.Day.ToString("00") + "_" + currentTime.Hour.ToString("00") + currentTime.Minute.ToString("00") + currentTime.Second.ToString("00") + ".txt";
+            string filename = "KatanaSimEvaluation_" + currentTime.Year.ToString("0000") + currentTime.Month.ToString("00") + currentTime.Day.ToString("00") + "_" + currentTime.Hour.ToString("00") + currentTime.Minute.ToString("00") + currentTime.Second.ToString("00") + ".txt";
             System.IO.StreamWriter file = new System.IO.StreamWriter(@filename, true);
 
             string line;
-            line = "Elapsed Time (ms), Roll Input (ratio), Pitch Input (ratio), Yaw Input (ratio), X Acceleration (m/s/s), Y Acceleration (m/s/s) , Z Acceleration (m/s/s) , Roll (rad) , Pitch (rad) , Yaw (rad) , Roll Velocity (rad/s) , Pitch Velocity (rad/s) , Yaw Velocity (rad/s) , Roll Acceleration (rad/s/s) , Pitch Acceleration (rad/s/s) , Yaw Acceleration (rad/s/s)";
+            line = "ElapsedTime_ms, RollInputCmd_ratio, PitchInputCmd_ratio, YawInputCmd_ratio, RollInputXP_ratio, PitchInputXP_ratio, YawInputXP_ratio, XAccelModel_mss, YAccelModel_mss , ZAccelModel_mss , " + 
+                "RollModel_rad , PitchModel_rad , YawModel_rad , RollVelocityModel_rads , PitchVelocityModel_rads , YawVelocityModel_rads ," +
+                " RollAccelModel_radss , PitchAccelModel_radss , YawAccelModel_radss";
+
+            if (_imuConnection != null && _imuConnection.IsOpen())
+            {
+                line += ", " + _imuConnection.GetLineFormatRads();
+            } 
             
             file.WriteLine(line);
             file.Flush();
@@ -676,9 +756,14 @@ namespace FlightControlInput
                 MDACommand data = fromBytes(dataBytes);
                 
                 
-                line = elapsedTimer.ElapsedMilliseconds.ToString() + ", " + RollRatio.ToString() + "," + PitchRatio.ToString() + "," + YawRatio.ToString() 
+                line = elapsedTimer.ElapsedMilliseconds.ToString() + ", " + RollRatio.ToString() + "," + PitchRatio.ToString() + "," + YawRatio.ToString()
+                    + ", " + (data.buffet_roll).ToString() + "," + (data.buffet_pitch).ToString() + "," + (data.buffet_yaw).ToString()
                     + "," + data.a_x.ToString() + ", " + data.a_y.ToString() + ", " + data.a_z.ToString() + ", " + data.roll.ToString() + ", " + data.pitch.ToString() + ", " + data.yaw.ToString() + ", " + data.v_roll.ToString() + ", " + data.v_pitch.ToString() + ", " + data.v_yaw.ToString() + ", " + data.a_roll.ToString() + ", " + data.a_pitch.ToString() + ", " + data.a_yaw.ToString();
-                 
+
+                if (_imuConnection != null && _imuConnection.IsOpen())
+                {
+                    line += ", " + _imuConnection.GetCurrentDataRads();
+                } 
 
                 file.WriteLine(line);
                 FrameCounter++;

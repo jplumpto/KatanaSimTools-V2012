@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using CMT;
 
-namespace MotionPlatformControl
+namespace FlightControlInput
 {
     
     #region MTi

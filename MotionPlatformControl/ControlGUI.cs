@@ -99,7 +99,9 @@ namespace MotionPlatformControl
         const byte MOOG_NEWMDA = 0x80; //New MDA accelerations
         const byte MOOG_NEWMDAFILE = 0x9B;  //Change MDA File
 
-        private byte[] MOOG_MDAOPTIONS = new byte[13] { 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113};
+        private byte[] MOOG_MDAOPTIONS = new byte[40] { 101, 102, 103, 104, 105, 106, 107, 
+            108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 
+            125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140};
         private ComboBox.ObjectCollection MOOG_MDAOPTIONSTRINGS = null;
         #endregion
 
@@ -282,6 +284,7 @@ namespace MotionPlatformControl
                 InputUpdate = false;
                 InputUDPPortBox.Enabled = true;
                 ConnectInputUDPButton.Enabled = true;
+                sinusoidalCheckBox.Enabled = true;
                 CreateInputDataButton.Text = "Create";
             }
             else
@@ -309,6 +312,7 @@ namespace MotionPlatformControl
 
                 InputUDPPortBox.Enabled = false;
                 ConnectInputUDPButton.Enabled = false;
+                sinusoidalCheckBox.Enabled = false;
                 CreateInputDataButton.Text = "Stop";
             }
             
@@ -517,10 +521,10 @@ namespace MotionPlatformControl
                         break;
                     }
                 } //if
-                else if (recvTimer.ElapsedMilliseconds > 3000 && PlatformState != (byte)MachineStates.DISABLED)
+                else if (recvTimer.ElapsedMilliseconds > 10000 && PlatformState != (byte)MachineStates.DISABLED)
                 {
                     // Haven't heard from the platform in a long while
-                    PlatformState = (byte) MachineStates.DISABLED;
+                    PlatformState = (byte) MachineStates.INHIBITED;
                     StatusText.BeginInvoke(new InvokeDelegateState(UpdatePlatformState), PlatformState);
                     
                     // Reset Timer
@@ -665,6 +669,7 @@ namespace MotionPlatformControl
                                 }
                                 break;
                         }
+                        
 
                     }
                     catch (System.Exception ex)
@@ -1381,7 +1386,9 @@ namespace MotionPlatformControl
             //open text file
             Stopwatch elapsedTimer = new Stopwatch();
             DateTime currentTime = DateTime.Now;
-            string filename = "XPlaneFlightData_" + currentTime.Year.ToString("0000") + currentTime.Month.ToString("00") + currentTime.Day.ToString("00") + "_" + currentTime.Hour.ToString("00") + currentTime.Minute.ToString("00") + currentTime.Second.ToString("00") + ".txt";
+            string filename = "XPlaneFlightData_" + currentTime.Year.ToString("0000") + currentTime.Month.ToString("00") + currentTime.Day.ToString("00") +
+                "_" + currentTime.Hour.ToString("00") + currentTime.Minute.ToString("00") + currentTime.Second.ToString("00") + 
+                "_MDA" + RequestedMDAFile.ToString("000") + ".csv";
             System.IO.StreamWriter file = new System.IO.StreamWriter(@filename, true);
 
             //make label for top of file
@@ -1393,8 +1400,9 @@ namespace MotionPlatformControl
             //file.WriteLine("Time: " + time);
 
             string line;
-            line = "Elapsed Time (ms), X Acceleration (m/s/s), Y Acceleration (m/s/s) , Z Acceleration (m/s/s) , Roll (rad) , Pitch (rad) , Yaw (rad) , Roll Velocity (rad/s) , Pitch Velocity (rad/s) , Yaw Velocity (rad/s) , Roll Acceleration (rad/s/s) , Pitch Acceleration (rad/s/s) , Yaw Acceleration (rad/s/s)";
-            line += ", Moog Roll (rad), Moog Pitch (rad), Moog Yaw (rad)";
+            line = "ElapsedTime_ms, XAccelInput_mss, YAccelInput_mss , ZAccelInput_mss , RollInput_rad , PitchInput_rad , YawInput_rad , RollVelocityInput_rads , PitchVelocityInput_rads , YawVelocityInput_rads ," +
+                " RollAccelInput_radss , PitchAccelInput_radss , YawAccelInput_radss";
+            line += ", MoogRoll_rad , MoogPitch_rad , MoogYaw_rad ";
             if (_imuConnection != null && _imuConnection.IsOpen())
             {
                 line += ", " + _imuConnection.GetLineFormatRads();
@@ -1603,6 +1611,11 @@ namespace MotionPlatformControl
             }
 
             simulateData.SetYawStatus(YawCheckBox.Checked, float.Parse(YawAmpBox.Text), frequency, phase);
+        }
+
+        private void sinusoidalCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            simulateData.SetFunction(sinusoidalCheckBox.Checked);
         }
 
         #region UnitConversion

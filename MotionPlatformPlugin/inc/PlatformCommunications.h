@@ -14,6 +14,8 @@ const unsigned char MOOG_RESET = 0xA0;
 const unsigned char MOOG_MDAMODE = 0x8C;
 const unsigned char MOOG_NEWMDA = 0x80; //New MDA accelerations
 
+const unsigned char MOOG_ControlCommand = 0x36; //Made up for sending control inputs
+
 
 //MOOG MDA mode command
 struct MDACommand 

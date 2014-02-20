@@ -120,6 +120,30 @@
             this.openInputFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.controllerTimer = new System.Windows.Forms.Timer(this.components);
             this.recalibrateButton = new System.Windows.Forms.Button();
+            this.cmb_Connection = new System.Windows.Forms.ComboBox();
+            this.label34 = new System.Windows.Forms.Label();
+            this.ImuConnectButton = new System.Windows.Forms.Button();
+            this.label22 = new System.Windows.Forms.Label();
+            this.label23 = new System.Windows.Forms.Label();
+            this.label24 = new System.Windows.Forms.Label();
+            this.label25 = new System.Windows.Forms.Label();
+            this.label26 = new System.Windows.Forms.Label();
+            this.label27 = new System.Windows.Forms.Label();
+            this.label31 = new System.Windows.Forms.Label();
+            this.label32 = new System.Windows.Forms.Label();
+            this.label33 = new System.Windows.Forms.Label();
+            this.xbow_yaw = new System.Windows.Forms.TextBox();
+            this.xbow_pitch = new System.Windows.Forms.TextBox();
+            this.xbow_roll = new System.Windows.Forms.TextBox();
+            this.xbow_rVelo = new System.Windows.Forms.TextBox();
+            this.xbow_pVelo = new System.Windows.Forms.TextBox();
+            this.xbow_qVelo = new System.Windows.Forms.TextBox();
+            this.xbow_zAccel = new System.Windows.Forms.TextBox();
+            this.xbow_yAccel = new System.Windows.Forms.TextBox();
+            this.xbow_xAccel = new System.Windows.Forms.TextBox();
+            this.XPYawRatioText = new System.Windows.Forms.TextBox();
+            this.XPRollRatioText = new System.Windows.Forms.TextBox();
+            this.XPPitchRatioText = new System.Windows.Forms.TextBox();
             this.SinusoidalPanel.SuspendLayout();
             this.ControllerPanel.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -129,7 +153,7 @@
             // 
             this.AxText.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.AxText.BackColor = System.Drawing.Color.White;
-            this.AxText.Location = new System.Drawing.Point(438, 69);
+            this.AxText.Location = new System.Drawing.Point(461, 72);
             this.AxText.Name = "AxText";
             this.AxText.ReadOnly = true;
             this.AxText.Size = new System.Drawing.Size(70, 20);
@@ -139,7 +163,7 @@
             // 
             this.AyText.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.AyText.BackColor = System.Drawing.Color.White;
-            this.AyText.Location = new System.Drawing.Point(438, 95);
+            this.AyText.Location = new System.Drawing.Point(461, 98);
             this.AyText.Name = "AyText";
             this.AyText.ReadOnly = true;
             this.AyText.Size = new System.Drawing.Size(70, 20);
@@ -149,7 +173,7 @@
             // 
             this.AzText.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.AzText.BackColor = System.Drawing.Color.White;
-            this.AzText.Location = new System.Drawing.Point(438, 121);
+            this.AzText.Location = new System.Drawing.Point(461, 124);
             this.AzText.Name = "AzText";
             this.AzText.ReadOnly = true;
             this.AzText.Size = new System.Drawing.Size(70, 20);
@@ -159,7 +183,7 @@
             // 
             this.ArollText.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.ArollText.BackColor = System.Drawing.Color.White;
-            this.ArollText.Location = new System.Drawing.Point(438, 147);
+            this.ArollText.Location = new System.Drawing.Point(461, 150);
             this.ArollText.Name = "ArollText";
             this.ArollText.ReadOnly = true;
             this.ArollText.Size = new System.Drawing.Size(70, 20);
@@ -169,7 +193,7 @@
             // 
             this.ApitchText.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.ApitchText.BackColor = System.Drawing.Color.White;
-            this.ApitchText.Location = new System.Drawing.Point(438, 173);
+            this.ApitchText.Location = new System.Drawing.Point(461, 176);
             this.ApitchText.Name = "ApitchText";
             this.ApitchText.ReadOnly = true;
             this.ApitchText.Size = new System.Drawing.Size(70, 20);
@@ -179,7 +203,7 @@
             // 
             this.AyawText.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.AyawText.BackColor = System.Drawing.Color.White;
-            this.AyawText.Location = new System.Drawing.Point(438, 199);
+            this.AyawText.Location = new System.Drawing.Point(461, 202);
             this.AyawText.Name = "AyawText";
             this.AyawText.ReadOnly = true;
             this.AyawText.Size = new System.Drawing.Size(70, 20);
@@ -189,7 +213,7 @@
             // 
             this.VpitchText.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.VpitchText.BackColor = System.Drawing.Color.White;
-            this.VpitchText.Location = new System.Drawing.Point(438, 251);
+            this.VpitchText.Location = new System.Drawing.Point(461, 254);
             this.VpitchText.Name = "VpitchText";
             this.VpitchText.ReadOnly = true;
             this.VpitchText.Size = new System.Drawing.Size(70, 20);
@@ -199,7 +223,7 @@
             // 
             this.VrollText.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.VrollText.BackColor = System.Drawing.Color.White;
-            this.VrollText.Location = new System.Drawing.Point(438, 225);
+            this.VrollText.Location = new System.Drawing.Point(461, 228);
             this.VrollText.Name = "VrollText";
             this.VrollText.ReadOnly = true;
             this.VrollText.Size = new System.Drawing.Size(70, 20);
@@ -209,7 +233,7 @@
             // 
             this.VyawText.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.VyawText.BackColor = System.Drawing.Color.White;
-            this.VyawText.Location = new System.Drawing.Point(438, 277);
+            this.VyawText.Location = new System.Drawing.Point(461, 280);
             this.VyawText.Name = "VyawText";
             this.VyawText.ReadOnly = true;
             this.VyawText.Size = new System.Drawing.Size(70, 20);
@@ -219,7 +243,7 @@
             // 
             this.RollText.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.RollText.BackColor = System.Drawing.Color.White;
-            this.RollText.Location = new System.Drawing.Point(438, 303);
+            this.RollText.Location = new System.Drawing.Point(461, 306);
             this.RollText.Name = "RollText";
             this.RollText.ReadOnly = true;
             this.RollText.Size = new System.Drawing.Size(70, 20);
@@ -229,7 +253,7 @@
             // 
             this.PitchText.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.PitchText.BackColor = System.Drawing.Color.White;
-            this.PitchText.Location = new System.Drawing.Point(438, 329);
+            this.PitchText.Location = new System.Drawing.Point(461, 332);
             this.PitchText.Name = "PitchText";
             this.PitchText.ReadOnly = true;
             this.PitchText.Size = new System.Drawing.Size(70, 20);
@@ -239,7 +263,7 @@
             // 
             this.YawText.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.YawText.BackColor = System.Drawing.Color.White;
-            this.YawText.Location = new System.Drawing.Point(438, 355);
+            this.YawText.Location = new System.Drawing.Point(461, 358);
             this.YawText.Name = "YawText";
             this.YawText.ReadOnly = true;
             this.YawText.Size = new System.Drawing.Size(70, 20);
@@ -249,7 +273,7 @@
             // 
             this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(386, 73);
+            this.label1.Location = new System.Drawing.Point(409, 76);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(44, 13);
             this.label1.TabIndex = 2;
@@ -260,7 +284,7 @@
             // 
             this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(386, 98);
+            this.label2.Location = new System.Drawing.Point(409, 101);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(44, 13);
             this.label2.TabIndex = 2;
@@ -271,7 +295,7 @@
             // 
             this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(386, 124);
+            this.label3.Location = new System.Drawing.Point(409, 127);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(44, 13);
             this.label3.TabIndex = 2;
@@ -282,7 +306,7 @@
             // 
             this.label4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(387, 150);
+            this.label4.Location = new System.Drawing.Point(410, 153);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(43, 13);
             this.label4.TabIndex = 2;
@@ -293,7 +317,7 @@
             // 
             this.label5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(387, 176);
+            this.label5.Location = new System.Drawing.Point(410, 179);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(43, 13);
             this.label5.TabIndex = 2;
@@ -304,7 +328,7 @@
             // 
             this.label6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(390, 202);
+            this.label6.Location = new System.Drawing.Point(413, 205);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(40, 13);
             this.label6.TabIndex = 2;
@@ -315,7 +339,7 @@
             // 
             this.label7.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(393, 228);
+            this.label7.Location = new System.Drawing.Point(416, 231);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(37, 13);
             this.label7.TabIndex = 2;
@@ -326,7 +350,7 @@
             // 
             this.label8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(393, 254);
+            this.label8.Location = new System.Drawing.Point(416, 257);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(37, 13);
             this.label8.TabIndex = 2;
@@ -337,7 +361,7 @@
             // 
             this.label9.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(396, 280);
+            this.label9.Location = new System.Drawing.Point(419, 283);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(34, 13);
             this.label9.TabIndex = 2;
@@ -348,7 +372,7 @@
             // 
             this.label10.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(405, 306);
+            this.label10.Location = new System.Drawing.Point(428, 309);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(25, 13);
             this.label10.TabIndex = 2;
@@ -359,7 +383,7 @@
             // 
             this.label11.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(399, 332);
+            this.label11.Location = new System.Drawing.Point(422, 335);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(31, 13);
             this.label11.TabIndex = 2;
@@ -370,7 +394,7 @@
             // 
             this.label12.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(402, 358);
+            this.label12.Location = new System.Drawing.Point(425, 361);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(28, 13);
             this.label12.TabIndex = 2;
@@ -382,10 +406,10 @@
             this.errorBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.errorBar.BackColor = System.Drawing.Color.White;
-            this.errorBar.Location = new System.Drawing.Point(43, 355);
+            this.errorBar.Location = new System.Drawing.Point(35, 358);
             this.errorBar.Name = "errorBar";
             this.errorBar.ReadOnly = true;
-            this.errorBar.Size = new System.Drawing.Size(300, 20);
+            this.errorBar.Size = new System.Drawing.Size(323, 20);
             this.errorBar.TabIndex = 4;
             // 
             // InputRecordingCheckbox
@@ -433,11 +457,11 @@
             // ConnectInputUDPButton
             // 
             this.ConnectInputUDPButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.ConnectInputUDPButton.Location = new System.Drawing.Point(355, 34);
+            this.ConnectInputUDPButton.Location = new System.Drawing.Point(378, 37);
             this.ConnectInputUDPButton.Name = "ConnectInputUDPButton";
             this.ConnectInputUDPButton.Size = new System.Drawing.Size(75, 23);
             this.ConnectInputUDPButton.TabIndex = 32;
-            this.ConnectInputUDPButton.Text = "UDP port";
+            this.ConnectInputUDPButton.Text = "Connect";
             this.ConnectInputUDPButton.UseVisualStyleBackColor = true;
             this.ConnectInputUDPButton.Click += new System.EventHandler(this.ConnectMotionInputUDPButton_Click);
             // 
@@ -484,7 +508,7 @@
             // 
             this.InputUDPPortBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.InputUDPPortBox.BackColor = System.Drawing.Color.White;
-            this.InputUDPPortBox.Location = new System.Drawing.Point(436, 36);
+            this.InputUDPPortBox.Location = new System.Drawing.Point(459, 39);
             this.InputUDPPortBox.Name = "InputUDPPortBox";
             this.InputUDPPortBox.Size = new System.Drawing.Size(70, 20);
             this.InputUDPPortBox.TabIndex = 28;
@@ -607,7 +631,7 @@
             // 
             this.label13.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(405, 9);
+            this.label13.Location = new System.Drawing.Point(428, 12);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(70, 13);
             this.label13.TabIndex = 35;
@@ -837,11 +861,287 @@
             this.recalibrateButton.UseVisualStyleBackColor = true;
             this.recalibrateButton.Click += new System.EventHandler(this.recalibrateButton_Click);
             // 
+            // cmb_Connection
+            // 
+            this.cmb_Connection.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.cmb_Connection.FormattingEnabled = true;
+            this.cmb_Connection.Location = new System.Drawing.Point(617, 38);
+            this.cmb_Connection.Name = "cmb_Connection";
+            this.cmb_Connection.Size = new System.Drawing.Size(86, 21);
+            this.cmb_Connection.TabIndex = 70;
+            this.cmb_Connection.SelectedIndexChanged += new System.EventHandler(this.cmb_Connection_SelectedIndexChanged);
+            // 
+            // label34
+            // 
+            this.label34.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label34.AutoSize = true;
+            this.label34.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label34.Location = new System.Drawing.Point(619, 10);
+            this.label34.Name = "label34";
+            this.label34.Size = new System.Drawing.Size(32, 17);
+            this.label34.TabIndex = 69;
+            this.label34.Text = "IMU";
+            // 
+            // ImuConnectButton
+            // 
+            this.ImuConnectButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.ImuConnectButton.Enabled = false;
+            this.ImuConnectButton.Location = new System.Drawing.Point(553, 37);
+            this.ImuConnectButton.Name = "ImuConnectButton";
+            this.ImuConnectButton.Size = new System.Drawing.Size(58, 23);
+            this.ImuConnectButton.TabIndex = 68;
+            this.ImuConnectButton.Text = "Connect";
+            this.ImuConnectButton.UseVisualStyleBackColor = true;
+            this.ImuConnectButton.Click += new System.EventHandler(this.AhrsConnect_Click);
+            // 
+            // label22
+            // 
+            this.label22.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label22.AutoSize = true;
+            this.label22.Location = new System.Drawing.Point(585, 285);
+            this.label22.Name = "label22";
+            this.label22.Size = new System.Drawing.Size(28, 13);
+            this.label22.TabIndex = 59;
+            this.label22.Text = "Yaw";
+            this.label22.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // label23
+            // 
+            this.label23.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label23.AutoSize = true;
+            this.label23.Location = new System.Drawing.Point(582, 259);
+            this.label23.Name = "label23";
+            this.label23.Size = new System.Drawing.Size(31, 13);
+            this.label23.TabIndex = 63;
+            this.label23.Text = "Pitch";
+            this.label23.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // label24
+            // 
+            this.label24.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label24.AutoSize = true;
+            this.label24.Location = new System.Drawing.Point(588, 233);
+            this.label24.Name = "label24";
+            this.label24.Size = new System.Drawing.Size(25, 13);
+            this.label24.TabIndex = 64;
+            this.label24.Text = "Roll";
+            this.label24.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // label25
+            // 
+            this.label25.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label25.AutoSize = true;
+            this.label25.Location = new System.Drawing.Point(579, 207);
+            this.label25.Name = "label25";
+            this.label25.Size = new System.Drawing.Size(34, 13);
+            this.label25.TabIndex = 62;
+            this.label25.Text = "r Velo";
+            this.label25.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // label26
+            // 
+            this.label26.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label26.AutoSize = true;
+            this.label26.Location = new System.Drawing.Point(576, 181);
+            this.label26.Name = "label26";
+            this.label26.Size = new System.Drawing.Size(37, 13);
+            this.label26.TabIndex = 60;
+            this.label26.Text = "q Velo";
+            this.label26.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // label27
+            // 
+            this.label27.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label27.AutoSize = true;
+            this.label27.Location = new System.Drawing.Point(576, 155);
+            this.label27.Name = "label27";
+            this.label27.Size = new System.Drawing.Size(37, 13);
+            this.label27.TabIndex = 61;
+            this.label27.Text = "p Velo";
+            this.label27.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // label31
+            // 
+            this.label31.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label31.AutoSize = true;
+            this.label31.Location = new System.Drawing.Point(569, 127);
+            this.label31.Name = "label31";
+            this.label31.Size = new System.Drawing.Size(44, 13);
+            this.label31.TabIndex = 67;
+            this.label31.Text = "Z Accel";
+            this.label31.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // label32
+            // 
+            this.label32.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label32.AutoSize = true;
+            this.label32.Location = new System.Drawing.Point(569, 101);
+            this.label32.Name = "label32";
+            this.label32.Size = new System.Drawing.Size(44, 13);
+            this.label32.TabIndex = 65;
+            this.label32.Text = "Y Accel";
+            this.label32.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // label33
+            // 
+            this.label33.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.label33.AutoSize = true;
+            this.label33.Location = new System.Drawing.Point(569, 76);
+            this.label33.Name = "label33";
+            this.label33.Size = new System.Drawing.Size(44, 13);
+            this.label33.TabIndex = 66;
+            this.label33.Text = "X Accel";
+            this.label33.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // xbow_yaw
+            // 
+            this.xbow_yaw.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.xbow_yaw.BackColor = System.Drawing.Color.White;
+            this.xbow_yaw.Location = new System.Drawing.Point(621, 282);
+            this.xbow_yaw.Name = "xbow_yaw";
+            this.xbow_yaw.ReadOnly = true;
+            this.xbow_yaw.Size = new System.Drawing.Size(70, 20);
+            this.xbow_yaw.TabIndex = 53;
+            // 
+            // xbow_pitch
+            // 
+            this.xbow_pitch.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.xbow_pitch.BackColor = System.Drawing.Color.White;
+            this.xbow_pitch.Location = new System.Drawing.Point(621, 256);
+            this.xbow_pitch.Name = "xbow_pitch";
+            this.xbow_pitch.ReadOnly = true;
+            this.xbow_pitch.Size = new System.Drawing.Size(70, 20);
+            this.xbow_pitch.TabIndex = 54;
+            // 
+            // xbow_roll
+            // 
+            this.xbow_roll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.xbow_roll.BackColor = System.Drawing.Color.White;
+            this.xbow_roll.Location = new System.Drawing.Point(621, 230);
+            this.xbow_roll.Name = "xbow_roll";
+            this.xbow_roll.ReadOnly = true;
+            this.xbow_roll.Size = new System.Drawing.Size(70, 20);
+            this.xbow_roll.TabIndex = 55;
+            // 
+            // xbow_rVelo
+            // 
+            this.xbow_rVelo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.xbow_rVelo.BackColor = System.Drawing.Color.White;
+            this.xbow_rVelo.Location = new System.Drawing.Point(621, 204);
+            this.xbow_rVelo.Name = "xbow_rVelo";
+            this.xbow_rVelo.ReadOnly = true;
+            this.xbow_rVelo.Size = new System.Drawing.Size(70, 20);
+            this.xbow_rVelo.TabIndex = 50;
+            // 
+            // xbow_pVelo
+            // 
+            this.xbow_pVelo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.xbow_pVelo.BackColor = System.Drawing.Color.White;
+            this.xbow_pVelo.Location = new System.Drawing.Point(621, 152);
+            this.xbow_pVelo.Name = "xbow_pVelo";
+            this.xbow_pVelo.ReadOnly = true;
+            this.xbow_pVelo.Size = new System.Drawing.Size(70, 20);
+            this.xbow_pVelo.TabIndex = 51;
+            // 
+            // xbow_qVelo
+            // 
+            this.xbow_qVelo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.xbow_qVelo.BackColor = System.Drawing.Color.White;
+            this.xbow_qVelo.Location = new System.Drawing.Point(621, 178);
+            this.xbow_qVelo.Name = "xbow_qVelo";
+            this.xbow_qVelo.ReadOnly = true;
+            this.xbow_qVelo.Size = new System.Drawing.Size(70, 20);
+            this.xbow_qVelo.TabIndex = 52;
+            // 
+            // xbow_zAccel
+            // 
+            this.xbow_zAccel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.xbow_zAccel.BackColor = System.Drawing.Color.White;
+            this.xbow_zAccel.Location = new System.Drawing.Point(621, 124);
+            this.xbow_zAccel.Name = "xbow_zAccel";
+            this.xbow_zAccel.ReadOnly = true;
+            this.xbow_zAccel.Size = new System.Drawing.Size(70, 20);
+            this.xbow_zAccel.TabIndex = 58;
+            // 
+            // xbow_yAccel
+            // 
+            this.xbow_yAccel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.xbow_yAccel.BackColor = System.Drawing.Color.White;
+            this.xbow_yAccel.Location = new System.Drawing.Point(621, 98);
+            this.xbow_yAccel.Name = "xbow_yAccel";
+            this.xbow_yAccel.ReadOnly = true;
+            this.xbow_yAccel.Size = new System.Drawing.Size(70, 20);
+            this.xbow_yAccel.TabIndex = 56;
+            // 
+            // xbow_xAccel
+            // 
+            this.xbow_xAccel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.xbow_xAccel.BackColor = System.Drawing.Color.White;
+            this.xbow_xAccel.Location = new System.Drawing.Point(621, 72);
+            this.xbow_xAccel.Name = "xbow_xAccel";
+            this.xbow_xAccel.ReadOnly = true;
+            this.xbow_xAccel.Size = new System.Drawing.Size(70, 20);
+            this.xbow_xAccel.TabIndex = 57;
+            // 
+            // XPYawRatioText
+            // 
+            this.XPYawRatioText.BackColor = System.Drawing.Color.White;
+            this.XPYawRatioText.Location = new System.Drawing.Point(327, 254);
+            this.XPYawRatioText.Name = "XPYawRatioText";
+            this.XPYawRatioText.Size = new System.Drawing.Size(51, 20);
+            this.XPYawRatioText.TabIndex = 71;
+            this.XPYawRatioText.Text = "0";
+            this.XPYawRatioText.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // XPRollRatioText
+            // 
+            this.XPRollRatioText.BackColor = System.Drawing.Color.White;
+            this.XPRollRatioText.Location = new System.Drawing.Point(327, 169);
+            this.XPRollRatioText.Name = "XPRollRatioText";
+            this.XPRollRatioText.Size = new System.Drawing.Size(51, 20);
+            this.XPRollRatioText.TabIndex = 72;
+            this.XPRollRatioText.Text = "0";
+            this.XPRollRatioText.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // XPPitchRatioText
+            // 
+            this.XPPitchRatioText.BackColor = System.Drawing.Color.White;
+            this.XPPitchRatioText.Location = new System.Drawing.Point(327, 195);
+            this.XPPitchRatioText.Name = "XPPitchRatioText";
+            this.XPPitchRatioText.Size = new System.Drawing.Size(51, 20);
+            this.XPPitchRatioText.TabIndex = 73;
+            this.XPPitchRatioText.Text = "0";
+            this.XPPitchRatioText.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
             // ControlGUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(544, 436);
+            this.ClientSize = new System.Drawing.Size(724, 395);
+            this.Controls.Add(this.XPYawRatioText);
+            this.Controls.Add(this.XPRollRatioText);
+            this.Controls.Add(this.XPPitchRatioText);
+            this.Controls.Add(this.cmb_Connection);
+            this.Controls.Add(this.label34);
+            this.Controls.Add(this.ImuConnectButton);
+            this.Controls.Add(this.label22);
+            this.Controls.Add(this.label23);
+            this.Controls.Add(this.label24);
+            this.Controls.Add(this.label25);
+            this.Controls.Add(this.label26);
+            this.Controls.Add(this.label27);
+            this.Controls.Add(this.label31);
+            this.Controls.Add(this.label32);
+            this.Controls.Add(this.label33);
+            this.Controls.Add(this.xbow_yaw);
+            this.Controls.Add(this.xbow_pitch);
+            this.Controls.Add(this.xbow_roll);
+            this.Controls.Add(this.xbow_rVelo);
+            this.Controls.Add(this.xbow_pVelo);
+            this.Controls.Add(this.xbow_qVelo);
+            this.Controls.Add(this.xbow_zAccel);
+            this.Controls.Add(this.xbow_yAccel);
+            this.Controls.Add(this.xbow_xAccel);
             this.Controls.Add(this.recalibrateButton);
             this.Controls.Add(this.OpenFile);
             this.Controls.Add(this.ControllerPanel);
@@ -971,6 +1271,30 @@
         private System.Windows.Forms.OpenFileDialog openInputFileDialog;
         private System.Windows.Forms.Timer controllerTimer;
         private System.Windows.Forms.Button recalibrateButton;
+        private System.Windows.Forms.ComboBox cmb_Connection;
+        private System.Windows.Forms.Label label34;
+        private System.Windows.Forms.Button ImuConnectButton;
+        private System.Windows.Forms.Label label22;
+        private System.Windows.Forms.Label label23;
+        private System.Windows.Forms.Label label24;
+        private System.Windows.Forms.Label label25;
+        private System.Windows.Forms.Label label26;
+        private System.Windows.Forms.Label label27;
+        private System.Windows.Forms.Label label31;
+        private System.Windows.Forms.Label label32;
+        private System.Windows.Forms.Label label33;
+        private System.Windows.Forms.TextBox xbow_yaw;
+        private System.Windows.Forms.TextBox xbow_pitch;
+        private System.Windows.Forms.TextBox xbow_roll;
+        private System.Windows.Forms.TextBox xbow_rVelo;
+        private System.Windows.Forms.TextBox xbow_pVelo;
+        private System.Windows.Forms.TextBox xbow_qVelo;
+        private System.Windows.Forms.TextBox xbow_zAccel;
+        private System.Windows.Forms.TextBox xbow_yAccel;
+        private System.Windows.Forms.TextBox xbow_xAccel;
+        private System.Windows.Forms.TextBox XPYawRatioText;
+        private System.Windows.Forms.TextBox XPRollRatioText;
+        private System.Windows.Forms.TextBox XPPitchRatioText;
     }
 }
 

@@ -203,6 +203,7 @@
             this.YawCheckBox = new System.Windows.Forms.CheckBox();
             this.label36 = new System.Windows.Forms.Label();
             this.label37 = new System.Windows.Forms.Label();
+            this.sinusoidalCheckBox = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -976,7 +977,35 @@
             "109",
             "110",
             "111",
-            "112"});
+            "112",
+            "113",
+            "114",
+            "115",
+            "116",
+            "117",
+            "118",
+            "119",
+            "120",
+            "121",
+            "122",
+            "123",
+            "124",
+            "125",
+            "126",
+            "127",
+            "128",
+            "129",
+            "130",
+            "131",
+            "132",
+            "133",
+            "134",
+            "135",
+            "136",
+            "137",
+            "138",
+            "139",
+            "140"});
             this.MDAFileBox.Location = new System.Drawing.Point(455, 139);
             this.MDAFileBox.Name = "MDAFileBox";
             this.MDAFileBox.Size = new System.Drawing.Size(95, 21);
@@ -1538,11 +1567,25 @@
             this.label37.Text = "Freq\r\n(rad/s)";
             this.label37.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // sinusoidalCheckBox
+            // 
+            this.sinusoidalCheckBox.AutoSize = true;
+            this.sinusoidalCheckBox.Checked = true;
+            this.sinusoidalCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.sinusoidalCheckBox.Location = new System.Drawing.Point(15, 92);
+            this.sinusoidalCheckBox.Name = "sinusoidalCheckBox";
+            this.sinusoidalCheckBox.Size = new System.Drawing.Size(74, 17);
+            this.sinusoidalCheckBox.TabIndex = 43;
+            this.sinusoidalCheckBox.Text = "Sinusoidal";
+            this.sinusoidalCheckBox.UseVisualStyleBackColor = true;
+            this.sinusoidalCheckBox.CheckedChanged += new System.EventHandler(this.sinusoidalCheckBox_CheckedChanged);
+            // 
             // ControlGUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(802, 436);
+            this.Controls.Add(this.sinusoidalCheckBox);
             this.Controls.Add(this.XAmpBox);
             this.Controls.Add(this.YAmpBox);
             this.Controls.Add(this.ZAmpBox);
@@ -1771,6 +1814,7 @@
         private System.Windows.Forms.CheckBox YawCheckBox;
         private System.Windows.Forms.Label label36;
         private System.Windows.Forms.Label label37;
+        private System.Windows.Forms.CheckBox sinusoidalCheckBox;
     }
 }
 

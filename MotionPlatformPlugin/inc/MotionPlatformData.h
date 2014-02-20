@@ -19,6 +19,7 @@ Additions:			Jonathan Plumpton - April 24, 2013
 #include "../../external/XplaneSdk/CHeaders/xplm/XPLMProcessing.h"
 #include "../../external/XplaneSdk/CHeaders/xplm/XPLMDataAccess.h"
 #include "../../external//XplaneSdk/CHeaders/xplm/XPLMUtilities.h"
+#include "../../external//XplaneSdk/CHeaders/XPLM/XPLMMenus.h"
 
 // Disable: unreferenced formal parameter.
 #pragma warning( disable : 4100 )
@@ -59,3 +60,6 @@ void MPD_GetMotionData(void);
 void initiate_MDACommand();
 
 double elapsedTime();
+
+// Don't want to use buttons? Here is a nice little menu
+void         MPD_MenuHandler(void *, void *);

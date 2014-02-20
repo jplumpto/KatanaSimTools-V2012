@@ -5,8 +5,19 @@
 
 // Used to store calculated motion data
 float MPD_LocalGravity = 0.0f;
+bool b_sendControlInputs = false;
 
 MDACommand *MPD_MDACommand;
+
+// control input command
+XPLMMenuID   MPD_MenuId;
+int          MPD_MenuItem;
+int			 MPD_MenuItemID;
+
+// Control Input DataRefs
+XPLMDataRef MPD_DR_rollRatio = NULL;
+XPLMDataRef MPD_DR_pitchRatio = NULL;
+XPLMDataRef MPD_DR_yawRatio = NULL;
 
 // Datarefs
 XPLMDataRef MPD_DR_localG = NULL;
@@ -54,10 +65,26 @@ PLUGIN_API int XPluginStart(
 						char *		outDesc)
 {
 	strcpy(outName, "MotionPlatformData");
-	strcpy(outSig, "xplanesdk.examples.motiondplatformdata");
-	strcpy(outDesc, "A plug-in that derives motion platform data from datarefs.");
+	strcpy(outSig, "katanasim.motiondplatformdata");
+	strcpy(outDesc, "Plug-in to send motion data from datarefs to motion platform.");
+
+	MPD_MenuItem = -1;
 
 	return 1;
+}
+
+void         MPD_MenuHandler(void *mRef, void *iRef)
+{
+	if( b_sendControlInputs)
+	{
+		b_sendControlInputs = false;
+		XPLMCheckMenuItem(MPD_MenuId,MPD_MenuItemID,xplm_Menu_Unchecked);
+	}
+	else
+	{
+		b_sendControlInputs = true;
+		XPLMCheckMenuItem(MPD_MenuId,MPD_MenuItemID,xplm_Menu_Checked);
+	} //if
 }
 
 //---------------------------------------------------------------------------
@@ -71,8 +98,22 @@ PLUGIN_API void	XPluginStop(void)
 
 PLUGIN_API int XPluginEnable(void)
 {
-	
 	XPLMDebugString("Motion Platform Plugin: Enabling Plugin...\n");
+
+	//Add menu
+	if (MPD_MenuItem < 0)
+		MPD_MenuItem = XPLMAppendMenuItem(XPLMFindPluginsMenu(),"MotionData",NULL,1);
+
+	MPD_MenuId = XPLMCreateMenu("MotionData",XPLMFindPluginsMenu(),MPD_MenuItem,MPD_MenuHandler,NULL);
+	MPD_MenuItemID = XPLMAppendMenuItem(MPD_MenuId,"Send Control Inputs",(void *)"Change",1);
+	XPLMCheckMenuItem(MPD_MenuId,MPD_MenuItemID,xplm_Menu_Unchecked);
+
+
+	//Init DataRefs
+
+	MPD_DR_pitchRatio	= XPLMFindDataRef("sim/joystick/yoke_pitch_ratio");
+	MPD_DR_rollRatio	= XPLMFindDataRef("sim/joystick/yoke_roll_ratio");
+	MPD_DR_yawRatio		= XPLMFindDataRef("sim/joystick/yoke_heading_ratio");
 	
 	MPD_DR_localG = XPLMFindDataRef("sim/weather/gravity_mss");
 	MPD_DR_gnrml = XPLMFindDataRef("sim/flightmodel/forces/g_nrml");
@@ -159,6 +200,10 @@ PLUGIN_API void XPluginDisable(void)
 	MPD_MDAConnection = NULL;
 	free(MPD_MDACommand);
 	XPLMUnregisterFlightLoopCallback(MotionPlatformDataLoopCB, NULL);
+
+	//Kill Menu
+	XPLMDestroyMenu(MPD_MenuId);
+	MPD_MenuId = NULL;
 
 	//End Communications?
 }
@@ -339,6 +384,11 @@ void MPD_GetMotionData(void)
 	//float groundspeed = XPLMGetDataf(MPD_DR_groundspeed);
 	static float DEG_TO_RADS = 1.0f * (3.1415926536f / 180);
 	
+	// Control Inputs 
+	float pitch = XPLMGetDataf(MPD_DR_pitchRatio);
+	float roll = XPLMGetDataf(MPD_DR_rollRatio);
+	float yaw = XPLMGetDataf(MPD_DR_yawRatio);
+	
 	float theta = XPLMGetDataf(MPD_DR_theta);
 	float psi = XPLMGetDataf(MPD_DR_psi);
 	float phi = XPLMGetDataf(MPD_DR_phi);
@@ -379,6 +429,20 @@ void MPD_GetMotionData(void)
 	MPD_MDACommand->a_x		= -1.0 * a_axil;
 	MPD_MDACommand->a_y		= a_side;
 	MPD_MDACommand->a_z		= a_nrml - MPD_LocalGravity;
+
+	if (b_sendControlInputs == true)
+	{
+		MPD_MDACommand->MCW = MOOG_ControlCommand;
+		MPD_MDACommand->buffet_pitch = pitch;
+		MPD_MDACommand->buffet_roll = roll;
+		MPD_MDACommand->buffet_yaw = yaw;
+	}
+	else
+	{
+		MPD_MDACommand->buffet_pitch = 0.0f;
+		MPD_MDACommand->buffet_roll = 0.0f;
+		MPD_MDACommand->buffet_yaw = 0.0f;
+	}
 
 	//Buffeting - Assume 0 for now
 	MPD_MDACommand->v_vehicle = TAS;
