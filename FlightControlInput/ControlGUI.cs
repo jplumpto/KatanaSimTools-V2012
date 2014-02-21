@@ -150,7 +150,8 @@ namespace FlightControlInput
             MotionInputBytes = getBytes(CurrentMDACommand);
             InitializeThread();
 
-
+            cmb_Connection.Items.AddRange(SerialPort.GetPortNames());
+            cmb_ArduinoConnection.Items.AddRange(SerialPort.GetPortNames());
         }
         #endregion
 
@@ -318,6 +319,11 @@ namespace FlightControlInput
                 if (arduino.IsOpen())
                 {
                     arduino.SendBytes(recvBytes);
+
+                    if (arduino.ArduinoError())
+                    {
+                        errorBar.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), errorBar, arduino.GetErrorMessage());
+                    }
                 }
             }
 
@@ -995,6 +1001,11 @@ namespace FlightControlInput
                 byte[] array = new byte[floatArray.Length * 4];
                 Buffer.BlockCopy(floatArray, 0, array, 0, array.Length);
                 arduino.SendBytes(array);
+
+                if (arduino.ArduinoError())
+                {
+                    errorBar.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), errorBar, arduino.GetErrorMessage());
+                }
             }
         }
 
@@ -1086,6 +1097,11 @@ namespace FlightControlInput
                 if (arduino.IsOpen())
                 {
                     arduino.SendBytes(recvBytes);
+
+                    if (arduino.ArduinoError())
+                    {
+                        errorBar.BeginInvoke(new InvokeDelegateTextString(UpdateTextBoxValue), errorBar, arduino.GetErrorMessage());
+                    }
                 }
             }
 
@@ -1138,6 +1154,40 @@ namespace FlightControlInput
                 arduino.SendBytes(array);
                 arduino.SendBytes(array);
             }
+        }
+
+        private void cmb_ArduinoConnection_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ArduinoConnectButton.Enabled = true;
+        }
+
+        private void ArduinoConnect_Click(object sender, EventArgs e)
+        {
+            if (arduino.IsOpen())
+            {
+                arduino.DisconnectSerial();
+                ArduinoConnectButton.Text = "Connect";
+            }
+            else
+            {
+                string portName = cmb_ArduinoConnection.Text;
+                SerialStatus stat = arduino.ConnectSerial(portName, 38400);
+
+                switch (stat)
+                {
+                    case SerialStatus.SUCCESS:
+                        //Console.WriteLine("Successfully connected to AHRS.");
+                        break;
+                    case SerialStatus.PING_RESPONSE_FAILURE:
+                    case SerialStatus.CONNECTION_FAILURE:
+                    case SerialStatus.PACKET_SIZE_MISSMATCH:
+                        //Console.WriteLine(_crossbowConnection.GetErrorMessage());
+                        MessageBox.Show("Failed to connect:" + arduino.GetErrorMessage());
+                        return;
+                }
+
+                ArduinoConnectButton.Text = "Disconnect";
+            } //if
         }
         
         #region UnitConversion

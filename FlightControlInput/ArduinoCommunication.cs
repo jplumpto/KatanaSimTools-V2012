@@ -24,6 +24,7 @@ namespace FlightControlInput
         private Mutex LocalMonitorMutex;
         private Mutex LocalDataMutex;
         private bool isMonitoring;
+        private bool b_error = false;
 
         private List<byte> m_buffer;
         private Stopwatch m_freqTimer;
@@ -109,23 +110,23 @@ namespace FlightControlInput
             //Check connection is open
             if (!h_ArduinoSerialPort.IsOpen)
             {
-                m_msg = "ArduIMU connection failed to open.";
+                m_msg = "Arduino connection failed to open.";
                 return SerialStatus.CONNECTION_FAILURE;
             }
 
             Thread.Sleep(100);
             h_ArduinoSerialPort.DiscardOutBuffer();
 
-            // Changes to polled mode
-            h_ArduinoSerialPort.Write(new char[1] { 'P' }, 0, 1);
+            //// Changes to polled mode
+            //h_ArduinoSerialPort.Write(new char[1] { 'P' }, 0, 1);
 
-            Thread.Sleep(100);
+            //Thread.Sleep(100);
 
-            if (!pingSerial(5000))
-            {
-                h_ArduinoSerialPort.Close();
-                return SerialStatus.PING_RESPONSE_FAILURE;
-            }
+            //if (!pingSerial(5000))
+            //{
+            //    h_ArduinoSerialPort.Close();
+            //    return SerialStatus.PING_RESPONSE_FAILURE;
+            //}
             
             m_freqTimer.Start();
 
@@ -200,6 +201,10 @@ namespace FlightControlInput
             return status;
         }
 
+        public bool ArduinoError()
+        {
+            return b_error;
+        }
         #endregion
 
         #region Thread
@@ -216,6 +221,18 @@ namespace FlightControlInput
             byte checksum = (byte)((rollAnalog + pitchAnalog + yawAnalog) % 256);
 
             byte[] transmitArray = new byte[] { HEADER, rollAnalog, pitchAnalog, yawAnalog, checksum };
+
+            //Read last message
+            if (h_ArduinoSerialPort.BytesToRead > 0)
+            {
+                m_msg = h_ArduinoSerialPort.ReadLine();
+                h_ArduinoSerialPort.DiscardInBuffer();
+                b_error = true;
+            }
+            else
+            {
+                b_error = false;
+            }
 
             h_ArduinoSerialPort.Write(transmitArray, 0, transmitArray.Length);
         }
