@@ -185,6 +185,14 @@ namespace FlightControlInput
         #region Init
         private void ConnectMotionInputUDPButton_Click(object sender, EventArgs e)
         {
+            if (MotionInputUpdate)
+            {
+                MotionInputUpdate = false;
+                InputUDPPortBox.Enabled = true;
+                ConnectInputUDPButton.Text = "Connect";
+                return;
+            }
+
             if (!Int32.TryParse(InputUDPPortBox.Text, out InputUDPPort))
             {
                 InputUDPPort = 5345;
@@ -204,7 +212,7 @@ namespace FlightControlInput
             }
 
             InputUDPPortBox.Enabled = false;
-            ConnectInputUDPButton.Enabled = false;
+            ConnectInputUDPButton.Text = "Disconnect";
         }
 
         private void CreateInputDataButton_Click(object sender, EventArgs e)
